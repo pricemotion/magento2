@@ -1,0 +1,50 @@
+#!/bin/bash
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+magento_version='2.3.5-p1'
+sample_data_version="${magento_version%%-*}"
+
+magento_url="https://github.com/magento/magento2/archive/${magento_version}.tar.gz"
+sample_data_url="https://github.com/magento/magento2-sample-data/archive/${sample_data_version}.tar.gz"
+
+magento_package="pkg/magento-${magento_version}.tgz"
+sample_data_package="pkg/magento-sample-data-${sample_data_version}.tgz"
+
+db=pricemotion_magento2
+
+download() {
+    if [[ ! -f "$1" ]]; then
+        mkdir -p "$(dirname "$1")"
+        wget -O "$1~" "$2"
+        mv "$1~" "$1"
+    fi
+}
+
+download "$magento_package" "$magento_url"
+download "$sample_data_package" "$sample_data_url"
+
+rm -rf www
+
+mkdir www
+tar xf "$magento_package" -C www --strip-components 1
+
+mkdir www/sample-data
+tar xf "$sample_data_package" -C www/sample-data --strip-components 1
+
+cd www
+
+composer install --no-scripts --no-plugins --ignore-platform-reqs
+
+php -f sample-data/dev/tools/build-sample-data.php -- --ce-source=.
+symlinks -cr .
+
+mysqladmin drop -f "$db" &>/dev/null || true
+mysqladmin create "$db"
+
+echo "Database: $db" >&2
+echo "Complete the installation in your browser now, and press enter to continue." >&2
+read -s
+
+bin/magento deploy:mode:set developer
