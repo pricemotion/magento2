@@ -19,7 +19,7 @@
                 <field id="attr_ean" showInDefault="1" type="select">
                     <label>EAN</label>
                     <comment><![CDATA[Pricemotion looks for prices using your product's EAN codes. Make sure you have an EAN attribute defined, and select it here.]]></comment>
-                    <validate>required-entry</validate>
+                    <validate>validate-select</validate>
                     <source_model>Pricemotion\Magento2\Model\Config\Source\ProductAttributes</source_model>
                 </field>
             </group>
