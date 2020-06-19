@@ -2,16 +2,25 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <section id="Pricemotion_Pricemotion" showInDefault="1" sortOrder="200">
+        <section id="Pricemotion_Magento2" showInDefault="1" sortOrder="200">
             <label>Pricemotion</label>
             <tab>catalog</tab>
-            <resource>Pricemotion_Pricemotion::config</resource>
+            <resource>Pricemotion_Magento2::config</resource>
             <group id="general" showInDefault="1">
                 <label>General</label>
                 <field id="api_key" showInDefault="1">
                     <label>API key</label>
                     <comment><![CDATA[Find your Pricemotion API key by logging in to <a href="https://www.pricemotion.nl" target="_blank" rel="noopener">Pricemotion</a>.]]></comment>
                     <validate>required-entry validate-data</validate>
+                </field>
+            </group>
+            <group id="attributes" showInDefault="1">
+                <label>Attributes</label>
+                <field id="attr_ean" showInDefault="1" type="select">
+                    <label>EAN</label>
+                    <comment><![CDATA[Pricemotion looks for prices using your product's EAN codes. Make sure you have an EAN attribute defined, and select it here.]]></comment>
+                    <validate>required-entry</validate>
+                    <source_model>Pricemotion\Magento2\Model\Config\Source\ProductAttributes</source_model>
                 </field>
             </group>
         </section>
