@@ -1,0 +1,23 @@
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="pricemotion">
+       <argument name="data" xsi:type="array">
+           <item name="config" xsi:type="array">
+               <item name="label" xsi:type="string">Pricemotion</item>
+               <item name="collapsible" xsi:type="boolean">true</item>
+               <item name="initializeFieldsetDataByDefault" xsi:type="boolean">true</item>
+               <item name="sortOrder" xsi:type="number">100</item>
+           </item>
+       </argument>
+       <container name="pricemotion_container">
+           <argument name="data" xsi:type="array">
+               <item name="config" xsi:type="array">
+                   <item name="sortOrder" xsi:type="number">160</item>
+               </item>
+           </argument>
+           <htmlContent name="pricemotion_content">
+               <argument name="block" xsi:type="object">Pricemotion\Magento2\Block\Adminhtml\Catalog\Product\Edit\Tab\Pricemotion</argument>
+           </htmlContent>
+       </container>
+   </fieldset>
+</form>
