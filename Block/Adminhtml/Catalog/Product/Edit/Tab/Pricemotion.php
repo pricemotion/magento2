@@ -6,18 +6,22 @@ use Magento\Csp\Model\Policy\FetchPolicy;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
 use Magento\Catalog\Model\Product;
+use Pricemotion\Magento2\App\Config;
 
 class Pricemotion extends Template {
     protected $_template = 'product/edit/pricemotion.phtml';
     private $coreRegistry;
+    private $config;
 
     public function __construct(
         Template\Context $context,
         Registry $coreRegistry,
         DynamicCollector $csp,
+        Config $config,
         array $data = []
     ) {
         $this->coreRegistry = $coreRegistry;
+        $this->config = $config;
         $csp->add(new FetchPolicy('frame-src', false, [$this->getWebUrl()]));
         parent::__construct($context, $data);
     }
@@ -25,7 +29,7 @@ class Pricemotion extends Template {
     protected function _beforeToHtml() {
         $this->assign('settings', [
             'web_url' => $this->getWebUrl(),
-            'ean' => $this->getProduct()->getData($this->getEanAttribute()),
+            'ean' => $this->getProduct()->getData($this->config->getEanAttribute()),
             'token' => $this->getApiToken(),
         ]);
 
@@ -33,15 +37,15 @@ class Pricemotion extends Template {
     }
 
     private function getApiToken(): ?string {
-        if (!$this->getApiKey()) {
+        if (!$this->config->getApiKey()) {
             return null;
         }
 
         $expiresAt = time() + 3600;
 
         return $this->base64encode(implode('', [
-            hash('sha256', $this->getApiKey(), true),
-            hash_hmac('sha256', $expiresAt, $this->getApiKey(), true),
+            hash('sha256', $this->config->getApiKey(), true),
+            hash_hmac('sha256', $expiresAt, $this->config->getApiKey(), true),
             pack('P', $expiresAt),
         ]));
     }
@@ -56,16 +60,8 @@ class Pricemotion extends Template {
         return $result;
     }
 
-    private function getApiKey(): ?string {
-        return $this->_scopeConfig->getValue('pricemotion/general/api_key');
-    }
-
     private function getProduct(): Product {
         return $this->coreRegistry->registry('current_product');
-    }
-
-    private function getEanAttribute(): ?string {
-        return $this->_scopeConfig->getValue('pricemotion/attributes/ean');
     }
 
     public function getViewFileUrl($fileId, array $params = []) {
