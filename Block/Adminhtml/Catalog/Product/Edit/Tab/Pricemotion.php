@@ -18,13 +18,13 @@ class Pricemotion extends Template {
         array $data = []
     ) {
         $this->coreRegistry = $coreRegistry;
-        $csp->add(new FetchPolicy('frame-src', false, [$this->getAppUrl()]));
+        $csp->add(new FetchPolicy('frame-src', false, [$this->getWebUrl()]));
         parent::__construct($context, $data);
     }
 
     protected function _beforeToHtml() {
         $this->assign('settings', [
-            'app_url' => $this->getAppUrl(),
+            'web_url' => $this->getWebUrl(),
             'ean' => $this->getProduct()->getData($this->getEanAttribute()),
             'token' => $this->getApiToken(),
         ]);
@@ -74,7 +74,7 @@ class Pricemotion extends Template {
         return $url;
     }
 
-    private function getAppUrl() {
-        return 'http://localhost:8562'; // TODO: Change for production
+    private function getWebUrl() {
+        return 'http://localhost:8080'; // TODO: Change for production
     }
 }

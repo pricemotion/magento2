@@ -14,13 +14,13 @@ function Pricemotion(rootSelector) {
 
     const frame = document.createElement('iframe');
     frame.classList.add('pricemotion-frame');
-    frame.src = settings.app_url + '/integration/widget?' + buildQuery({
+    frame.src = settings.web_url + '/widget?' + buildQuery({
         token: settings.token,
         ean: settings.ean
     });
     frame.style.width = '100%';
     frame.style.border = '0';
-    frame.style.height = '0';
+    frame.style.height = '250px';
 
     root.appendChild(frame);
 
