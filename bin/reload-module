@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+mysql pricemotion_magento2 -e 'DELETE FROM setup_module WHERE module = "Pricemotion_Magento2"'
+
+./bin/magento setup:upgrade
