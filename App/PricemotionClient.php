@@ -20,8 +20,7 @@ class PricemotionClient {
             throw new \RuntimeException("API response is not valid XML");
         }
 
-        // TODO: Handle errors
-        // TODO: Return Product
+        return Product::fromXmlResponse($document);
     }
 
     private function get(string $path, array $params) {
@@ -48,12 +47,12 @@ class PricemotionClient {
         if (!$ch) {
             throw new \RuntimeException("curl_init failed");
         }
-        $options = array_merge([
+        $options += [
             CURLOPT_URL => $this->getUrl($path),
             CURLOPT_FAILONERROR => true,
             CURLOPT_TIMEOUT => 15,
             CURLOPT_RETURNTRANSFER => true,
-        ], $options);
+        ];
         if (!curl_setopt_array($ch, $options)) {
             throw new \RuntimeException(sprintf(
                 "curl_setopt_array failed: (%s) %s",
@@ -79,6 +78,6 @@ class PricemotionClient {
     }
 
     private function getUrl(string $path): string {
-        return "https://www.pricemotion.nl/api";
+        return "https://www.pricemotion.nl" . $path;
     }
 }

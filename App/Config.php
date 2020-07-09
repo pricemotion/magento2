@@ -14,22 +14,22 @@ class Config {
         return $this->config->getValue('pricemotion/attributes/ean');
     }
 
-    public function getApiKey(): ?string {
-        return $this->config->getValue('pricemotion/general/api_key');
-    }
-
     public function getApiToken(): ?string {
-        if (!$this->config->getApiKey()) {
+        if (!$this->getApiKey()) {
             return null;
         }
 
         $expiresAt = time() + 3600;
 
         return $this->base64encode(implode('', [
-            hash('sha256', $this->config->getApiKey(), true),
-            hash_hmac('sha256', $expiresAt, $this->config->getApiKey(), true),
+            hash('sha256', $this->getApiKey(), true),
+            hash_hmac('sha256', $expiresAt, $this->getApiKey(), true),
             pack('P', $expiresAt),
         ]));
+    }
+
+    public function getApiKey(): ?string {
+        return $this->config->getValue('pricemotion/general/api_key');
     }
 
     private function base64encode(string $data): string {
