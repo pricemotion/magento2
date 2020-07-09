@@ -8,34 +8,53 @@ class PricemotionClient {
         $this->config = $config;
     }
 
-    /**
-     * @param string[] $eans
-     */
-    public function subscribe(array $eans): void {
-        $this->post('/subscribe', [
-            'eans' => $eans,
+    public function getProduct(EAN $ean): Product {
+        $result = $this->get('/service/', [
+            'token' => $this->config->getApiToken(),
+            'ean' => $ean->toString(),
         ]);
+
+        $document = new \DOMDocument();
+
+        if (!$document->loadXML($result)) {
+            throw new \RuntimeException("API response is not valid XML");
+        }
+
+        // TODO: Handle errors
+        // TODO: Return Product
     }
 
-    private function post($path, array $data): array {
+    private function get(string $path, array $params) {
+        $path = $path . '?' . http_build_query($params);
+        return $this->request($path);
+    }
+
+    private function post(string $path, array $data): array {
         $json = json_encode($data);
         if ($json === false) {
             throw new \RuntimeException("JSON encode failed");
         }
-        $ch = curl_init();
-        if (!$ch) {
-            throw new \RuntimeException("curl_init failed");
-        }
-        if (!curl_setopt_array($ch, [
-            CURLOPT_URL => $this->getUrl($path),
+        $result = $this->request($path, [
             CURLOPT_POSTFIELDS => $json,
             CURLOPT_HTTPHEADER => [
                 'Content-Type: application/json',
             ],
+        ]);
+        return $this->decodeResponse($result);
+    }
+
+    private function request(string $path, array $options = []): string {
+        $ch = curl_init();
+        if (!$ch) {
+            throw new \RuntimeException("curl_init failed");
+        }
+        $options = array_merge([
+            CURLOPT_URL => $this->getUrl($path),
             CURLOPT_FAILONERROR => true,
             CURLOPT_TIMEOUT => 15,
             CURLOPT_RETURNTRANSFER => true,
-        ])) {
+        ], $options);
+        if (!curl_setopt_array($ch, $options)) {
             throw new \RuntimeException(sprintf(
                 "curl_setopt_array failed: (%s) %s",
                 curl_errno($ch), curl_error($ch)
@@ -48,7 +67,7 @@ class PricemotionClient {
                 curl_errno($ch), curl_error($ch)
             ));
         }
-        return $this->decodeResponse($result);
+        return $result;
     }
 
     private function decodeResponse(string $response): array {

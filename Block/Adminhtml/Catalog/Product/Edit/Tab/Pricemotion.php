@@ -30,34 +30,10 @@ class Pricemotion extends Template {
         $this->assign('settings', [
             'web_url' => $this->getWebUrl(),
             'ean' => $this->getProduct()->getData($this->config->getEanAttribute()),
-            'token' => $this->getApiToken(),
+            'token' => $this->config->getApiToken(),
         ]);
 
         return parent::_beforeToHtml();
-    }
-
-    private function getApiToken(): ?string {
-        if (!$this->config->getApiKey()) {
-            return null;
-        }
-
-        $expiresAt = time() + 3600;
-
-        return $this->base64encode(implode('', [
-            hash('sha256', $this->config->getApiKey(), true),
-            hash_hmac('sha256', $expiresAt, $this->config->getApiKey(), true),
-            pack('P', $expiresAt),
-        ]));
-    }
-
-    private function base64encode(string $data): string {
-        $result = base64_encode($data);
-        $result = rtrim($result, '=');
-        $result = strtr($result, [
-            '+' => '-',
-            '/' => '_',
-        ]);
-        return $result;
     }
 
     private function getProduct(): Product {

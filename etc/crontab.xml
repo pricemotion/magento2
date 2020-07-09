@@ -3,7 +3,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
         <job name="pricemotion_update_products"
-             instance="Pricemotion\Magento2\Cron\Subscribe"
+             instance="Pricemotion\Magento2\Cron\Update"
              method="execute"
         >
             <schedule>* * * * *</schedule>
