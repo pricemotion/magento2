@@ -43,5 +43,17 @@ class InstallData implements InstallDataInterface {
                 'visible' => false,
             ]
         );
+
+        $this->eavSetup->addAttribute(
+            Product::ENTITY,
+            Constants::ATTR_UPDATED_AT,
+            [
+                'label' => 'Pricemotion Timestamp',
+                'type' => 'text',
+                'input' => 'text',
+                'required' => false,
+                'visible' => false,
+            ]
+        );
     }
 }

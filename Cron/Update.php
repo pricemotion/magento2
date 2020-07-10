@@ -4,13 +4,16 @@ namespace Pricemotion\Magento2\Cron;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Framework\Logger\Monolog;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\App\EAN;
 use Pricemotion\Magento2\App\PricemotionClient;
-use Psr\Log\LoggerInterface;
 
 class Update {
+    private const UPDATE_INTERVAL = 3600 * 12;
+
+    private $globalLogger;
     private $logger;
     private $productCollectionFactory;
     private $config;
@@ -19,13 +22,13 @@ class Update {
     private $productResourceModel;
 
     public function __construct(
-        LoggerInterface $logger,
+        Monolog $logger,
         CollectionFactory $product_collection_factory,
         Config $config,
         PricemotionClient $pricemotion_client,
         ProductResourceModel $product_resource_model
     ) {
-        $this->logger = $logger;
+        $this->globalLogger = $logger;
         $this->productCollectionFactory = $product_collection_factory;
         $this->config = $config;
         $this->pricemotion = $pricemotion_client;
@@ -33,7 +36,7 @@ class Update {
     }
 
     public function execute(): void {
-        // TODO: Update each product only once per 24 hours
+        $this->logger = $this->globalLogger->withName('pricemotion');
 
         $this->eanAttribute = $this->config->getEanAttribute();
         if (!$this->eanAttribute) {
@@ -47,6 +50,7 @@ class Update {
         $product_collection = $this->productCollectionFactory->create();
         $product_collection->addAttributeToFilter($this->eanAttribute, ['neq' => '']);
         $product_collection->addAttributeToSelect($this->eanAttribute);
+        $product_collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT);
         $product_collection->addPriceData();
         $product_collection->walk(function (Product $product) {
             $this->updateProduct($product);
@@ -60,10 +64,26 @@ class Update {
             $ean = EAN::fromString($ean_string);
         } catch (\InvalidArgumentException $e) {
             $this->logger->debug(sprintf(
-                "Skip invalid EAN '%s' on product %d: %s",
-                $ean_string, $product->getId(), $e->getMessage()
+                "Skipping product %d with invalid EAN '%s': %s",
+                $product->getId(), $ean_string, $e->getMessage()
             ));
+            return;
         }
+
+        $now = microtime(true);
+        if ((float) $product->getData(Constants::ATTR_UPDATED_AT) > $now - self::UPDATE_INTERVAL) {
+            $this->logger->debug(sprintf(
+                "Skipping product %d because it was updated %.3f s ago",
+                $product->getId(),
+                $now - $product->getData(Constants::ATTR_UPDATED_AT)
+            ));
+            return;
+        }
+
+        $this->logger->info(sprintf(
+            "Updating product %d with EAN %s",
+            $product->getId(), $ean->toString()
+        ));
 
         try {
             $pricemotion_product = $this->pricemotion->getProduct($ean);
@@ -72,6 +92,7 @@ class Update {
                 "Could not get Pricemotion data for product %d with EAN %s: %s",
                 $product->getId(), $ean->toString(), $e->getMessage()
             ));
+            return;
         }
 
         $product->setData(Constants::ATTR_LOWEST_PRICE, $pricemotion_product->getLowestPrice());
@@ -81,6 +102,8 @@ class Update {
         } else {
             $product->unsetData(Constants::ATTR_LOWEST_PRICE_RATIO);
         }
+
+        $product->setData(Constants::ATTR_UPDATED_AT, microtime(true));
 
         $this->productResourceModel->save($product);
     }
