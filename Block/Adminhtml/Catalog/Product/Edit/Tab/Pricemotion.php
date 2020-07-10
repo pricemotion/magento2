@@ -7,6 +7,7 @@ use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
 use Magento\Catalog\Model\Product;
 use Pricemotion\Magento2\App\Config;
+use Pricemotion\Magento2\App\Constants;
 
 class Pricemotion extends Template {
     protected $_template = 'product/edit/pricemotion.phtml';
@@ -29,8 +30,9 @@ class Pricemotion extends Template {
     protected function _beforeToHtml() {
         $this->assign('settings', [
             'web_url' => $this->getWebUrl(),
-            'ean' => $this->getProduct()->getData($this->config->getEanAttribute()),
             'token' => $this->config->getApiToken(),
+            'ean' => $this->getProduct()->getData($this->config->getEanAttribute()),
+            'settings' => $this->getProduct()->getData(Constants::ATTR_SETTINGS) ?: new \stdClass(),
         ]);
 
         return parent::_beforeToHtml();

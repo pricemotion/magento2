@@ -2,6 +2,7 @@
 namespace Pricemotion\Magento2\Setup;
 
 use Magento\Catalog\Model\Product;
+use Magento\Eav\Model\Entity\Attribute\Backend\JsonEncoded;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Framework\Setup\InstallDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
@@ -54,6 +55,19 @@ class InstallData implements InstallDataInterface {
                 'required' => false,
                 'visible' => false,
                 'is_filterable' => true,
+            ]
+        );
+
+        $this->eavSetup->addAttribute(
+            Product::ENTITY,
+            Constants::ATTR_SETTINGS,
+            [
+                'label' => 'Pricemotion Settings',
+                'type' => 'text',
+                'input' => 'text',
+                'required' => false,
+                'visible' => false,
+                'backend' => JsonEncoded::class,
             ]
         );
     }
