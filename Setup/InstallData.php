@@ -26,6 +26,7 @@ class InstallData implements InstallDataInterface {
                 'required' => false,
                 'is_used_in_grid' => true,
                 'is_filterable_in_grid' => true,
+                'visible' => false,
             ]
         );
 
@@ -35,10 +36,11 @@ class InstallData implements InstallDataInterface {
             [
                 'label' => 'Price Difference (%)',
                 'type' => 'text',
-                'input' => 'number',
+                'input' => 'text',
                 'required' => false,
                 'is_used_in_grid' => true,
                 'is_filterable_in_grid' => true,
+                'visible' => false,
             ]
         );
     }
