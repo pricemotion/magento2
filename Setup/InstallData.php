@@ -35,7 +35,7 @@ class InstallData implements InstallDataInterface {
             Constants::ATTR_LOWEST_PRICE_RATIO,
             [
                 'label' => 'Price Difference (%)',
-                'type' => 'text',
+                'type' => 'decimal',
                 'input' => 'text',
                 'required' => false,
                 'is_used_in_grid' => true,
@@ -49,10 +49,11 @@ class InstallData implements InstallDataInterface {
             Constants::ATTR_UPDATED_AT,
             [
                 'label' => 'Pricemotion Timestamp',
-                'type' => 'text',
+                'type' => 'decimal',
                 'input' => 'text',
                 'required' => false,
                 'visible' => false,
+                'is_filterable' => true,
             ]
         );
     }

@@ -12,6 +12,7 @@ use Pricemotion\Magento2\App\PricemotionClient;
 
 class Update {
     private const UPDATE_INTERVAL = 3600 * 12;
+    private const MAX_DURATION = 55;
 
     private $globalLogger;
     private $logger;
@@ -36,6 +37,8 @@ class Update {
     }
 
     public function execute(): void {
+        $run_until = time() + self::MAX_DURATION;
+
         $this->logger = $this->globalLogger->withName('pricemotion');
 
         $this->eanAttribute = $this->config->getEanAttribute();
@@ -48,13 +51,34 @@ class Update {
         }
 
         $product_collection = $this->productCollectionFactory->create();
+
         $product_collection->addAttributeToFilter($this->eanAttribute, ['neq' => '']);
+        $product_collection->addAttributeToFilter(Constants::ATTR_UPDATED_AT, [
+            ['null' => true],
+            ['lt' => microtime(true) - self::UPDATE_INTERVAL],
+        ]);
+
         $product_collection->addAttributeToSelect($this->eanAttribute);
         $product_collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT);
+
         $product_collection->addPriceData();
-        $product_collection->walk(function (Product $product) {
+
+        /** @var Product[] $products */
+        $products = $product_collection->getItems();
+
+        $this->logger->info(sprintf("Got %d products for update", sizeof($products)));
+
+        shuffle($products);
+
+        $processed = 0;
+        foreach ($products as $product) {
             $this->updateProduct($product);
-        });
+            $processed++;
+
+            if (time() > $run_until) {
+                $this->logger->info(sprintf("Ran out of time after processing %d products", $processed));
+            }
+        }
     }
 
     private function updateProduct(Product $product): void {
@@ -66,16 +90,6 @@ class Update {
             $this->logger->debug(sprintf(
                 "Skipping product %d with invalid EAN '%s': %s",
                 $product->getId(), $ean_string, $e->getMessage()
-            ));
-            return;
-        }
-
-        $now = microtime(true);
-        if ((float) $product->getData(Constants::ATTR_UPDATED_AT) > $now - self::UPDATE_INTERVAL) {
-            $this->logger->debug(sprintf(
-                "Skipping product %d because it was updated %.3f s ago",
-                $product->getId(),
-                $now - $product->getData(Constants::ATTR_UPDATED_AT)
             ));
             return;
         }
