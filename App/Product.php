@@ -2,8 +2,9 @@
 namespace Pricemotion\Magento2\App;
 
 class Product {
-
     private $lowestPrice;
+    private $averagePrice;
+    private $offers;
 
     private function __construct() {}
 
@@ -19,21 +20,22 @@ class Product {
         }
 
         $product = new self;
-        $product->lowestPrice = self::getFloat($root, 'info/price/min');
+        $product->lowestPrice = Xml::getFloat($root, 'info/price/min');
+        $product->averagePrice = Xml::getFloat($root, 'info/price/avg');
+        $product->offers = OfferCollection::fromNode(Xml::get($root, 'prices'));
 
         return $product;
-    }
-
-    private static function getFloat(\DOMElement $root, string $query): float {
-        $elements = (new \DOMXPath($root->ownerDocument))->query($query, $root);
-        if ($elements->length !== 1) {
-            throw new \RuntimeException("Expected exactly one result from query '{$query}'");
-        }
-        return (float) trim($elements->item(0)->textContent);
     }
 
     public function getLowestPrice(): float {
         return $this->lowestPrice;
     }
 
+    public function getAveragePrice(): float {
+        return $this->averagePrice;
+    }
+
+    public function getOffers(): OfferCollection {
+        return $this->offers;
+    }
 }

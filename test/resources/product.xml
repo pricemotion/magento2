@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<response>
+    <info>
+        <name>Surel Gietijzeren wok mat zwart</name>
+        <ean>8680131811038</ean>
+        <price>
+            <min>52.50</min>
+            <avg>60.67</avg>
+            <median>61.00</median>
+            <max>69.50</max>
+        </price>
+    </info>
+    <prices>
+        <bezorg>
+            <item>
+                <seller>Blokker.nl</seller>
+                <price>69.50</price>
+                <realtime>Mon, 13 Jul 2020 07:46:47 +0000</realtime>
+            </item>
+            <item>
+                <seller>Bol.com Plaza</seller>
+                <price>52.50</price>
+                <realtime>Mon, 13 Jul 2020 07:46:47 +0000</realtime>
+            </item>
+            <item>
+                <seller>Habitas-Online (via bol.com)</seller>
+                <price>60.06</price>
+                <realtime>Mon, 13 Jul 2020 07:46:48 +0000</realtime>
+            </item>
+            <item>
+                <seller>Keuken Drachten (via bol.com)</seller>
+                <price>52.50</price>
+                <realtime>Mon, 13 Jul 2020 07:46:48 +0000</realtime>
+            </item>
+            <item>
+                <seller>Ovenwinkel.com (via bol.com)</seller>
+                <price>68.80</price>
+                <realtime>Mon, 13 Jul 2020 07:46:48 +0000</realtime>
+            </item>
+        </bezorg>
+    </prices>
+</response>

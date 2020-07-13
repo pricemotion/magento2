@@ -10,17 +10,10 @@
                 <item name="sortOrder" xsi:type="number">100</item>
             </item>
         </argument>
-        <container name="pricemotion_container">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="sortOrder" xsi:type="number">160</item>
-                </item>
+        <htmlContent name="pricemotion_content">
+            <argument name="block" xsi:type="object">
+                Pricemotion\Magento2\Block\Adminhtml\Catalog\Product\Edit\Tab\Pricemotion
             </argument>
-            <htmlContent name="pricemotion_content">
-                <argument name="block" xsi:type="object">
-                    Pricemotion\Magento2\Block\Adminhtml\Catalog\Product\Edit\Tab\Pricemotion
-                </argument>
-            </htmlContent>
-        </container>
+        </htmlContent>
     </fieldset>
 </form>

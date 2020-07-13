@@ -24,11 +24,8 @@ function Pricemotion(rootSelector) {
     frame.style.height = '250px';
     root.appendChild(frame);
 
-    const input = document.createElement('input');
-    input.name = 'product[pricemotion_settings]';
-    input.type = 'hidden';
-    input.value = JSON.stringify(settings.settings);
-    root.appendChild(input);
+    const settingsInput = addInput('pricemotion_settings', JSON.stringify(settings.settings));
+    let updatedAtInput;
 
     window.addEventListener('message', function (e) {
         if (e.origin !== settings.web_url) {
@@ -38,9 +35,22 @@ function Pricemotion(rootSelector) {
         if (message.type === 'setWidgetHeight') {
             frame.style.height = message.value + 'px';
         } else if (message.type === 'updateProductSettings') {
-            input.value = JSON.stringify(message.value);
+            settingsInput.value = JSON.stringify(message.value);
+            if (!updatedAtInput) {
+                updatedAtInput = addInput('pricemotion_updated_at', '0');
+            }
         }
     });
+
+    function addInput(name, value) {
+        const input = document.createElement('input');
+        input.name = 'product.' + name;
+        input.type = 'hidden';
+        input.value = value;
+        input.setAttribute('data-form-part', 'product_form');
+        root.appendChild(input);
+        return input;
+    }
 }
 
 new Pricemotion('#pricemotion');

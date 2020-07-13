@@ -7,7 +7,9 @@ use Magento\Framework\Logger\Monolog;
 use Monolog\Handler\StreamHandler;
 use Pricemotion\Magento2\Cron\Update as CronUpdate;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Update extends Command {
@@ -27,9 +29,18 @@ class Update extends Command {
         parent::__construct($name);
     }
 
+    public function configure() {
+        $this->setDefinition(new InputDefinition([
+            new InputOption('force', 'f', InputOption::VALUE_NONE),
+        ]));
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output) {
         $this->state->setAreaCode(Area::AREA_CRONTAB);
         $this->monolog->pushHandler(new StreamHandler(STDERR));
+        if ($input->getOption('force')) {
+            $this->job->setIgnoreUpdatedAt(true);
+        }
         $this->job->execute();
     }
 }

@@ -9,6 +9,8 @@ use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\App\EAN;
 use Pricemotion\Magento2\App\PricemotionClient;
+use Pricemotion\Magento2\App\PriceRule;
+use Psr\Log\InvalidArgumentException;
 
 class Update {
     private const UPDATE_INTERVAL = 3600 * 12;
@@ -21,6 +23,7 @@ class Update {
     private $pricemotion;
     private $eanAttribute;
     private $productResourceModel;
+    private $ignoreUpdatedAt = false;
 
     public function __construct(
         Monolog $logger,
@@ -34,6 +37,10 @@ class Update {
         $this->config = $config;
         $this->pricemotion = $pricemotion_client;
         $this->productResourceModel = $product_resource_model;
+    }
+
+    public function setIgnoreUpdatedAt(bool $value): void {
+        $this->ignoreUpdatedAt = $value;
     }
 
     public function execute(): void {
@@ -53,13 +60,17 @@ class Update {
         $product_collection = $this->productCollectionFactory->create();
 
         $product_collection->addAttributeToFilter($this->eanAttribute, ['neq' => '']);
-        $product_collection->addAttributeToFilter(Constants::ATTR_UPDATED_AT, [
-            ['null' => true],
-            ['lt' => microtime(true) - self::UPDATE_INTERVAL],
-        ]);
+
+        if (!$this->ignoreUpdatedAt) {
+            $product_collection->addAttributeToFilter(Constants::ATTR_UPDATED_AT, [
+                ['null' => true],
+                ['lt' => microtime(true) - self::UPDATE_INTERVAL],
+            ]);
+        }
 
         $product_collection->addAttributeToSelect($this->eanAttribute);
         $product_collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT);
+        $product_collection->addAttributeToSelect(Constants::ATTR_SETTINGS);
 
         $product_collection->addPriceData();
 
@@ -109,10 +120,36 @@ class Update {
             return;
         }
 
+        $settings = $product->getData(Constants::ATTR_SETTINGS);
+
+        $rule = new PriceRule\Disabled();
+        if ($settings) {
+            try {
+                $rule = (new PriceRule\Factory())->fromJson((string) $settings);
+            } catch (InvalidArgumentException $e) {
+                $this->logger->error(sprintf(
+                    "Invalid price rule for product %d: %s",
+                    $product->getId(), $e->getMessage()
+                ));
+            }
+        }
+
+        $new_price = $rule->calculate($pricemotion_product);
+        if ($new_price && abs($product->getData(Product::PRICE) - $new_price) > 0.005) {
+            $this->logger->info(sprintf(
+                "Adjusting product %d price from %.2f to %.2f according to %s",
+                $product->getId(),
+                (float) $product->getData(Product::PRICE),
+                $new_price,
+                get_class($rule)
+            ));
+            $product->setData(Product::PRICE, $new_price);
+        }
+
         $product->setData(Constants::ATTR_LOWEST_PRICE, $pricemotion_product->getLowestPrice());
 
         if ($price = (float) $product->getPrice()) {
-            $product->setData(Constants::ATTR_LOWEST_PRICE_RATIO, $pricemotion_product->getLowestPrice() / $price);
+            $product->setData(Constants::ATTR_LOWEST_PRICE_RATIO, $price / $pricemotion_product->getLowestPrice());
         } else {
             $product->unsetData(Constants::ATTR_LOWEST_PRICE_RATIO);
         }
