@@ -1,7 +1,6 @@
 <?php
 namespace Pricemotion\Magento2\App\PriceRule;
 
-use Pricemotion\Magento2\App\Product;
 use PHPUnit\Framework\TestCase;
 use Pricemotion\Magento2\App\ProductTest;
 

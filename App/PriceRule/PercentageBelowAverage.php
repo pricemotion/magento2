@@ -14,6 +14,10 @@ class PercentageBelowAverage implements PriceRuleInterface {
     }
 
     public function calculate(Product $product): ?float {
-        return $product->getAveragePrice() * (1 - $this->value);
+        return $this->roundDown($product->getAveragePrice() * (1 - $this->value), 0.01);
+    }
+
+    private function roundDown(float $value, float $step) {
+        return floor($value / $step) * $step;
     }
 }
