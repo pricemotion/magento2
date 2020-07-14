@@ -181,8 +181,8 @@ class Update {
             $minimum_price = $cost * (1 + $minimum_margin / 100);
             if ($new_price < $minimum_price) {
                 $this->logger->info(sprintf(
-                    "Using minimum margin protection price %s for product %d (%s + %s%%)",
-                    $minimum_price, $product->getId(), $cost, $minimum_margin
+                    "Using minimum margin protection price %s instead of %s for product %d (%s + %s%%)",
+                    $minimum_price, $new_price, $product->getId(), $cost, $minimum_margin
                 ));
                 $new_price = $minimum_price;
             }
