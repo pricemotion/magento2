@@ -30,6 +30,7 @@ class Pricemotion extends Template {
     protected function _beforeToHtml() {
         $this->assign('settings', [
             'web_url' => Constants::getWebUrl(),
+            'web_origin' => $this->getOrigin(Constants::getWebUrl()),
             'token' => $this->config->getApiToken(),
             'ean' => $this->getProduct()->getData($this->config->getEanAttribute()),
             'settings' => $this->getProduct()->getData(Constants::ATTR_SETTINGS) ?: new \stdClass(),

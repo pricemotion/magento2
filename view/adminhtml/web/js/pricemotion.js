@@ -28,7 +28,7 @@ function Pricemotion(rootSelector) {
     let updatedAtInput;
 
     window.addEventListener('message', function (e) {
-        if (e.origin !== settings.web_url) {
+        if (e.origin !== settings.web_origin) {
             return;
         }
         var message = JSON.parse(e.data);
