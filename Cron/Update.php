@@ -1,6 +1,7 @@
 <?php
 namespace Pricemotion\Magento2\Cron;
 
+use Magento\Catalog\Api\Data\CostInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
@@ -10,6 +11,7 @@ use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\App\EAN;
 use Pricemotion\Magento2\App\PricemotionClient;
 use Pricemotion\Magento2\App\PriceRule;
+use Pricemotion\Magento2\App\Product as PricemotionProduct;
 use Psr\Log\InvalidArgumentException;
 
 class Update {
@@ -120,31 +122,7 @@ class Update {
             return;
         }
 
-        $settings = $product->getData(Constants::ATTR_SETTINGS);
-
-        $rule = new PriceRule\Disabled();
-        if ($settings) {
-            try {
-                $rule = (new PriceRule\Factory())->fromJson((string) $settings);
-            } catch (InvalidArgumentException $e) {
-                $this->logger->error(sprintf(
-                    "Invalid price rule for product %d: %s",
-                    $product->getId(), $e->getMessage()
-                ));
-            }
-        }
-
-        $new_price = $rule->calculate($pricemotion_product);
-        if ($new_price && abs($product->getData(Product::PRICE) - $new_price) > 0.005) {
-            $this->logger->info(sprintf(
-                "Adjusting product %d price from %.2f to %.2f according to %s",
-                $product->getId(),
-                (float) $product->getData(Product::PRICE),
-                $new_price,
-                get_class($rule)
-            ));
-            $product->setData(Product::PRICE, $new_price);
-        }
+        $this->adjustPrice($product, $pricemotion_product);
 
         $product->setData(Constants::ATTR_LOWEST_PRICE, $pricemotion_product->getLowestPrice());
 
@@ -157,5 +135,62 @@ class Update {
         $product->setData(Constants::ATTR_UPDATED_AT, microtime(true));
 
         $this->productResourceModel->save($product);
+    }
+
+    private function adjustPrice(Product $product, PricemotionProduct $pricemotion_product): void {
+        $settings = $product->getData(Constants::ATTR_SETTINGS);
+        if (!$settings) {
+            return;
+        }
+
+        $settings = json_decode($settings, true);
+        if (!is_array($settings)) {
+            return;
+        }
+
+        try {
+            $rule = (new PriceRule\Factory())->fromArray($settings);
+        } catch (InvalidArgumentException $e) {
+            $this->logger->error(sprintf(
+                "Invalid price rule for product %d: %s",
+                $product->getId(), $e->getMessage()
+            ));
+            return;
+        }
+
+        $new_price = $rule->calculate($pricemotion_product);
+        if (!$new_price) {
+            return;
+        }
+
+        if (abs($product->getData(Product::PRICE) - $new_price) < 0.005) {
+            return;
+        }
+
+        if (!empty($settings['protectMargin'])) {
+            $minimum_margin = (float) $settings['minimumMargin'];
+            $cost = (float) $product->getData(CostInterface::COST);
+            if ($cost < 0.01) {
+                $this->logger->warning(sprintf(
+                    "Margin protection enabled, but no cost price found for product %d",
+                    $product->getId()
+                ));
+                return;
+            }
+            $minimum_price = $cost * (1 + $minimum_margin / 100);
+            if ($new_price < $minimum_price) {
+                $new_price = $minimum_price;
+            }
+        }
+
+        $this->logger->info(sprintf(
+            "Adjusting product %d price from %.2f to %.2f according to %s",
+            $product->getId(),
+            (float) $product->getData(Product::PRICE),
+            $new_price,
+            get_class($rule)
+        ));
+
+        $product->setData(Product::PRICE, $new_price);
     }
 }

@@ -9,11 +9,7 @@ class Factory {
         'lessThanPosition' => LessThanPosition::class,
     ];
 
-    public function fromJson(string $json): PriceRuleInterface {
-        $data = json_decode($json, true);
-        if (!is_array($data)) {
-            throw new \InvalidArgumentException("Price rule JSON is invalid");
-        }
+    public function fromArray(array $data): PriceRuleInterface {
         if (empty($data['rule'])) {
             throw new \InvalidArgumentException("Price rule JSON misses rule element");
         }
