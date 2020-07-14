@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -euo pipefail
+
+version="$(git describe --tags --exact-match --match 'v*')"
+version="${version#v}"
+
+git push origin master --tags
+
+package="$(bin/package)"
+
+hub release create \
+    --draft \
+    --prerelease \
+    --attach "$package" \
+    --message "Pricemotion for Magento 2 v${version}" \
+    --browse \
+    "v$version"

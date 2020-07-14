@@ -25,3 +25,5 @@ version="$version" perl -p -i -e 's/\$VERSION\$/$ENV{version}/g' App/Constants.p
 mkdir -p "$(dirname "$out")"
 zip -r9 "$out.$$" *
 mv "$out.$$" "$out"
+
+echo "$out"
