@@ -23,13 +23,13 @@ class Pricemotion extends Template {
     ) {
         $this->coreRegistry = $coreRegistry;
         $this->config = $config;
-        $csp->add(new FetchPolicy('frame-src', false, [$this->getWebUrl()]));
+        $csp->add(new FetchPolicy('frame-src', false, [$this->getOrigin(Constants::getWebUrl())]));
         parent::__construct($context, $data);
     }
 
     protected function _beforeToHtml() {
         $this->assign('settings', [
-            'web_url' => $this->getWebUrl(),
+            'web_url' => Constants::getWebUrl(),
             'token' => $this->config->getApiToken(),
             'ean' => $this->getProduct()->getData($this->config->getEanAttribute()),
             'settings' => $this->getProduct()->getData(Constants::ATTR_SETTINGS) ?: new \stdClass(),
@@ -44,11 +44,17 @@ class Pricemotion extends Template {
 
     public function getViewFileUrl($fileId, array $params = []) {
         $url = parent::getViewFileUrl($fileId, $params);
-        $url .= '?=' . uniqid(); // TODO: Only during development, otherwise append version
+        $url .= '?v=' . Constants::getAssetVersion();
         return $url;
     }
 
-    private function getWebUrl() {
-        return 'http://localhost:8080'; // TODO: Change for production
+    private function getOrigin(string $url): string {
+        $port = parse_url($url, PHP_URL_PORT);
+        return sprintf(
+            '%s://%s%s',
+            parse_url($url, PHP_URL_SCHEME),
+            parse_url($url, PHP_URL_HOST),
+            $port ? ":$port" : ''
+        );
     }
 }

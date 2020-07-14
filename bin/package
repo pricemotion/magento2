@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+version="$(git describe --tags --match 'v*')"
+version="${version#v}"
+
+out="$PWD/dist/pricemotion-magento2-$version.zip"
+
+echo "Packaging $version..." >&2
+
+tmp="$(mktemp -d)"
+cleanup() { rm -rf "$tmp"; }
+trap cleanup EXIT
+
+git archive HEAD . | tar x -C "$tmp"
+
+cd "$tmp"
+
+echo "$(cat composer.json | jq '. | .version = $v' --arg v "$version")" > composer.json
+
+version="$version" perl -p -i -e 's/\$VERSION\$/$ENV{version}/g' App/Constants.php
+
+mkdir -p "$(dirname "$out")"
+zip -r9 "$out.$$" *
+mv "$out.$$" "$out"
