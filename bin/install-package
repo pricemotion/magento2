@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+rm -rf www/app/code/Pricemotion/Magento2
+mkdir -p www/app/code/Pricemotion/Magento2
+
+package="$(bin/package)"
+
+bsdtar xf "$package" -C www/app/code/Pricemotion/Magento2
+
+bin/clear-magento-cache
