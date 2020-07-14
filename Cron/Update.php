@@ -73,6 +73,7 @@ class Update {
         $product_collection->addAttributeToSelect($this->eanAttribute);
         $product_collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT);
         $product_collection->addAttributeToSelect(Constants::ATTR_SETTINGS);
+        $product_collection->addAttributeToSelect(CostInterface::COST);
 
         $product_collection->addPriceData();
 
@@ -179,6 +180,10 @@ class Update {
             }
             $minimum_price = $cost * (1 + $minimum_margin / 100);
             if ($new_price < $minimum_price) {
+                $this->logger->info(sprintf(
+                    "Using minimum margin protection price %s for product %d (%s + %s%%)",
+                    $minimum_price, $product->getId(), $cost, $minimum_margin
+                ));
                 $new_price = $minimum_price;
             }
         }
