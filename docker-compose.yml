@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+
+  web:
+    build: docker/
+    volumes:
+      - ./www:/var/www/localhost/htdocs
+    links:
+      - mariadb
+    networks:
+      default:
+        ipv4_address: 172.21.1.2
+
+  mariadb:
+    image: mariadb:10.1.45
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_DATABASE: magento
+    networks:
+      default:
+        ipv4_address: 172.21.1.3
+
+
+networks:
+  default:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.21.1.0/24

@@ -1,3 +1,4 @@
 /bin        export-ignore
 Makefile    export-ignore
 /test       export-ignore
+/docker*    export-ignore
