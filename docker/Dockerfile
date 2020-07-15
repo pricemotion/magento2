@@ -1,9 +1,13 @@
 FROM alpine:3.7
 
 RUN apk add --no-cache \
-    sudo \
     bash \
+    gcc \
+    libsodium-dev \
+    make \
+    musl-dev \
     shadow \
+    sudo \
     php7-apache2 \
     php7-bcmath \
     php7-cli \
@@ -15,13 +19,22 @@ RUN apk add --no-cache \
     php7-intl \
     php7-json \
     php7-mbstring \
+    php7-opcache \
     php7-openssl \
     php7-pdo_mysql \
+    php7-session \
     php7-simplexml \
     php7-soap \
     php7-xml \
     php7-xsl \
+    php7-dev \
+    php7-pear \
     php7-zip
+
+RUN pecl install libsodium
+RUN echo 'extension=sodium.so' > /etc/php7/conf.d/00_sodium.ini
+
+RUN rm -rf /var/www/localhost/htdocs && ln -sfn ../../../data/www/pub /var/www/localhost/htdocs
 
 COPY entrypoint.sh /entrypoint.sh
 

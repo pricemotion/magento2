@@ -5,7 +5,8 @@ services:
   web:
     build: docker/
     volumes:
-      - ./www:/var/www/localhost/htdocs
+      - .:/data
+      - ./docker/apache2.conf:/etc/apache2/conf.d/local.conf
     links:
       - mariadb
     networks:

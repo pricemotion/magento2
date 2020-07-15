@@ -3,7 +3,7 @@
 set -euo pipefail
 cd /
 
-usermod -u `stat -c %u /var/www/localhost/htdocs` apache
+usermod -u `stat -c %u /data` apache
 
 mkdir -p /run/apache2
 exec httpd -D FOREGROUND -f /etc/apache2/httpd.conf
