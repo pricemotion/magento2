@@ -13,6 +13,7 @@ RUN apk add --no-cache \
     php7-cli \
     php7-ctype \
     php7-curl \
+    php7-dev \
     php7-dom \
     php7-gd \
     php7-iconv \
@@ -22,13 +23,14 @@ RUN apk add --no-cache \
     php7-opcache \
     php7-openssl \
     php7-pdo_mysql \
+    php7-pear \
+    php7-phar \
     php7-session \
     php7-simplexml \
     php7-soap \
+    php7-tokenizer \
     php7-xml \
     php7-xsl \
-    php7-dev \
-    php7-pear \
     php7-zip
 
 RUN pecl install libsodium
