@@ -1,5 +1,5 @@
 {
-    "name": "pricemotion/magento2",
+    "name": "pricemotion/module-pricemotion",
     "description": "Stay aware of your competitor's prices with Pricemotion",
     "type": "magento2-module",
     "licence": "GPL-3.0-or-later",
