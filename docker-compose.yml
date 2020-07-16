@@ -7,6 +7,7 @@ services:
     volumes:
       - .:/data
       - ./docker/apache2.conf:/etc/apache2/conf.d/local.conf
+      - ./docker/php.ini:/etc/php7/conf.d/99_docker.ini
     links:
       - mariadb
     networks:
