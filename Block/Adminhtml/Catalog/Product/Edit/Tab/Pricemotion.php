@@ -3,6 +3,7 @@ namespace Pricemotion\Magento2\Block\Adminhtml\Catalog\Product\Edit\Tab;
 
 use Magento\Csp\Model\Collector\DynamicCollector;
 use Magento\Csp\Model\Policy\FetchPolicy;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
 use Magento\Catalog\Model\Product;
@@ -17,13 +18,17 @@ class Pricemotion extends Template {
     public function __construct(
         Template\Context $context,
         Registry $coreRegistry,
-        DynamicCollector $csp,
         Config $config,
         array $data = []
     ) {
         $this->coreRegistry = $coreRegistry;
         $this->config = $config;
-        $csp->add(new FetchPolicy('frame-src', false, [$this->getOrigin(Constants::getWebUrl())]));
+
+        if (class_exists(DynamicCollector::class)) {
+            $csp = ObjectManager::getInstance()->get(DynamicCollector::class);
+            $csp->add(new FetchPolicy('frame-src', false, [$this->getOrigin(Constants::getWebUrl())]));
+        }
+
         parent::__construct($context, $data);
     }
 
