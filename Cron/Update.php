@@ -64,6 +64,7 @@ class Update {
         $product_collection->addAttributeToFilter($this->eanAttribute, ['neq' => '']);
 
         if (!$this->ignoreUpdatedAt) {
+            $product_collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT, 'left');
             $product_collection->addAttributeToFilter(Constants::ATTR_UPDATED_AT, [
                 ['null' => true],
                 ['lt' => microtime(true) - self::UPDATE_INTERVAL],
