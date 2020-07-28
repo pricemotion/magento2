@@ -145,7 +145,7 @@ class Update {
 
         try {
             $rule = (new PriceRule\Factory())->fromArray($settings);
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->logger->error(sprintf(
                 "Invalid price rule for product %d: %s",
                 $product->getId(), $e->getMessage()
