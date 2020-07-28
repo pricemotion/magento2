@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="entity_manager_save_before">
+        <observer name="pricemotion_product_save"
+                  instance="Pricemotion\Magento2\Observer\ProductSave" />
+    </event>
+</config>

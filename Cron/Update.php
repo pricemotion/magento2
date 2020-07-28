@@ -121,12 +121,6 @@ class Update {
 
         $product->setData(Constants::ATTR_LOWEST_PRICE, $pricemotion_product->getLowestPrice());
 
-        if ($price = (float) $product->getPrice()) {
-            $product->setData(Constants::ATTR_LOWEST_PRICE_RATIO, $price / $pricemotion_product->getLowestPrice());
-        } else {
-            $product->unsetData(Constants::ATTR_LOWEST_PRICE_RATIO);
-        }
-
         $product->setData(Constants::ATTR_UPDATED_AT, microtime(true));
 
         $this->productResourceModel->save($product);
