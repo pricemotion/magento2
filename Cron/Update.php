@@ -48,10 +48,7 @@ class Update {
 
         $this->eanAttribute = $this->config->getEanAttribute();
         if (!$this->eanAttribute) {
-            $this->logger->warning(sprintf(
-                "%s: No EAN product attribute is configured; not updating products",
-                __CLASS__
-            ));
+            $this->logger->warning("No EAN product attribute is configured; not updating products");
             return;
         }
 
