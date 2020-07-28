@@ -3,9 +3,9 @@ namespace Pricemotion\Magento2\Console\Command;
 
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
-use Magento\Framework\Logger\Monolog;
 use Monolog\Handler\StreamHandler;
 use Pricemotion\Magento2\Cron\Update as CronUpdate;
+use Pricemotion\Magento2\Logger\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,18 +14,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Update extends Command {
     private $job;
-    private $monolog;
     private $state;
+    private $logger;
 
     public function __construct(
         string $name,
         CronUpdate $job,
-        Monolog $monolog,
-        State $state
+        State $state,
+        Logger $logger
     ) {
         $this->job = $job;
-        $this->monolog = $monolog;
         $this->state = $state;
+        $this->logger = $logger;
         parent::__construct($name);
     }
 
@@ -37,7 +37,7 @@ class Update extends Command {
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $this->state->setAreaCode(Area::AREA_CRONTAB);
-        $this->monolog->pushHandler(new StreamHandler(STDERR));
+        $this->logger->pushHandler(new StreamHandler(STDERR));
         if ($input->getOption('force')) {
             $this->job->setIgnoreUpdatedAt(true);
         }

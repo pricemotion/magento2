@@ -5,20 +5,18 @@ use Magento\Catalog\Api\Data\CostInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
-use Magento\Framework\Logger\Monolog;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\App\EAN;
 use Pricemotion\Magento2\App\PricemotionClient;
 use Pricemotion\Magento2\App\PriceRule;
 use Pricemotion\Magento2\App\Product as PricemotionProduct;
-use Psr\Log\InvalidArgumentException;
+use Pricemotion\Magento2\Logger\Logger;
 
 class Update {
     private const UPDATE_INTERVAL = 3600 * 12;
     private const MAX_DURATION = 55;
 
-    private $globalLogger;
     private $logger;
     private $productCollectionFactory;
     private $config;
@@ -28,13 +26,13 @@ class Update {
     private $ignoreUpdatedAt = false;
 
     public function __construct(
-        Monolog $logger,
+        Logger $logger,
         CollectionFactory $product_collection_factory,
         Config $config,
         PricemotionClient $pricemotion_client,
         ProductResourceModel $product_resource_model
     ) {
-        $this->globalLogger = $logger;
+        $this->logger = $logger;
         $this->productCollectionFactory = $product_collection_factory;
         $this->config = $config;
         $this->pricemotion = $pricemotion_client;
@@ -47,8 +45,6 @@ class Update {
 
     public function execute(): void {
         $run_until = time() + self::MAX_DURATION;
-
-        $this->logger = $this->globalLogger->withName('pricemotion');
 
         $this->eanAttribute = $this->config->getEanAttribute();
         if (!$this->eanAttribute) {
