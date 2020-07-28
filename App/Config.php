@@ -14,6 +14,14 @@ class Config {
         return $this->config->getValue('pricemotion/attributes/ean');
     }
 
+    public function getPriceAttribute(): ?string {
+        return $this->config->getValue('pricemotion/attributes/price');
+    }
+
+    public function getListPriceAttribute(): ?string {
+        return $this->config->getValue('pricemotion/attributes/list_price');
+    }
+
     public function getApiToken(): ?string {
         if (!$this->getApiKey()) {
             return null;

@@ -22,6 +22,8 @@ class Update {
     private $config;
     private $pricemotion;
     private $eanAttribute;
+    private $priceAttribute;
+    private $listPriceAttribute;
     private $productResourceModel;
     private $ignoreUpdatedAt = false;
 
@@ -52,6 +54,9 @@ class Update {
             return;
         }
 
+        $this->priceAttribute = $this->config->getPriceAttribute();
+        $this->listPriceAttribute = $this->config->getListPriceAttribute();
+
         $product_collection = $this->productCollectionFactory->create();
 
         $product_collection->addAttributeToFilter($this->eanAttribute, ['neq' => '']);
@@ -65,6 +70,12 @@ class Update {
         }
 
         $product_collection->addAttributeToSelect($this->eanAttribute);
+        if ($this->priceAttribute) {
+            $product_collection->addAttributeToSelect($this->priceAttribute);
+        }
+        if ($this->listPriceAttribute) {
+            $product_collection->addAttributeToSelect($this->listPriceAttribute);
+        }
         $product_collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT);
         $product_collection->addAttributeToSelect(Constants::ATTR_SETTINGS);
         $product_collection->addAttributeToSelect(CostInterface::COST);
@@ -152,7 +163,11 @@ class Update {
             return;
         }
 
-        if (abs($product->getData(Product::PRICE) - $new_price) < 0.005) {
+        if (!$this->priceAttribute) {
+            $this->logger->error(sprintf(
+                "Prices rules are configured for product %d, but no price attribute is configured",
+                $product->getId()
+            ));
             return;
         }
 
@@ -160,30 +175,58 @@ class Update {
             $minimum_margin = (float) $settings['minimumMargin'];
             $cost = (float) $product->getData(CostInterface::COST);
             if ($cost < 0.01) {
-                $this->logger->warning(sprintf(
+                $this->logger->error(sprintf(
                     "Margin protection enabled, but no cost price found for product %d",
                     $product->getId()
                 ));
                 return;
             }
-            $minimum_price = $cost * (1 + $minimum_margin / 100);
+            $minimum_price = round($cost * (1 + $minimum_margin / 100), 2);
             if ($new_price < $minimum_price) {
                 $this->logger->info(sprintf(
-                    "Using minimum margin protection price %s instead of %s for product %d (%s + %s%%)",
+                    "Using minimum margin protection price %.4f instead of %.4f for product %d (%.4f + %.4f%%)",
                     $minimum_price, $new_price, $product->getId(), $cost, $minimum_margin
                 ));
                 $new_price = $minimum_price;
             }
         }
 
+        if (!empty($settings['limitListPriceDiscount'])) {
+            if (!$this->listPriceAttribute) {
+                $this->logger->warning(sprintf(
+                    "Maximum list price discount set for product %d, but no list price attribute is configured",
+                    $product->getId()
+                ));
+            } elseif (($list_price = (float) $product->getData($this->listPriceAttribute)) < 0.01) {
+                $this->logger->warning(sprintf(
+                    "Maximum list price discount enabled, but no list price found for product %d",
+                    $product->getId()
+                ));
+            } else {
+                $maximum_discount = (float) $settings['maximumListPriceDiscount'];
+                $minimum_price = round($list_price * (1 - $maximum_discount / 100), 2);
+                if ($new_price < $minimum_price) {
+                    $this->logger->info(sprintf(
+                        "Using maximum list price discount price %.4f instead of %.4f for product %d (%.4f - %.4f%%)",
+                        $minimum_price, $new_price, $product->getId(), $list_price, $maximum_discount
+                    ));
+                    $new_price = $minimum_price;
+                }
+            }
+        }
+
+        if (abs($product->getData($this->priceAttribute) - $new_price) < 0.005) {
+            return;
+        }
+
         $this->logger->info(sprintf(
             "Adjusting product %d price from %.2f to %.2f according to %s",
             $product->getId(),
-            (float) $product->getData(Product::PRICE),
+            (float) $product->getData($this->priceAttribute),
             $new_price,
             get_class($rule)
         ));
 
-        $product->setData(Product::PRICE, $new_price);
+        $product->setData($this->priceAttribute, $new_price);
     }
 }

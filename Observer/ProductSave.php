@@ -13,14 +13,18 @@ use Pricemotion\Magento2\App\Config;
 class ProductSave implements ObserverInterface {
 
     private $logger;
-    private $config;
+    private $eanAttribute;
+    private $priceAttribute;
+    private $listPriceAttribute;
 
     public function __construct(
         Logger $logger,
         Config $config
     ) {
         $this->logger = $logger;
-        $this->config = $config;
+        $this->eanAttribute = $config->getEanAttribute();
+        $this->priceAttribute = $config->getPriceAttribute();
+        $this->listPriceAttribute = $config->getListPriceAttribute();
     }
 
     public function execute(Observer $observer) {
@@ -37,7 +41,8 @@ class ProductSave implements ObserverInterface {
         if (
             ($changed_attributes = $this->changed(
                 $product,
-                ProductInterface::PRICE,
+                $this->priceAttribute,
+                $this->listPriceAttribute,
                 CostInterface::COST,
                 Constants::ATTR_SETTINGS
             ))
@@ -51,9 +56,7 @@ class ProductSave implements ObserverInterface {
             $product->setData(Constants::ATTR_UPDATED_AT, null);
         }
 
-        if (($ean_attribute = $this->config->getEanAttribute())
-            && $this->changed($product, $ean_attribute)
-        ) {
+        if ($this->changed($product, $this->eanAttribute)) {
             $this->logger->debug(sprintf(
                 "EAN changed on product %d; resetting uptime timestamp and lowest price...",
                 $product->getId()
@@ -66,7 +69,8 @@ class ProductSave implements ObserverInterface {
     }
 
     private function setLowestPriceRatio(Product $product) {
-        if (!$product->hasData(ProductInterface::PRICE)
+        if (!$this->priceAttribute
+            || !$product->hasData($this->priceAttribute)
             || !$product->hasData(Constants::ATTR_LOWEST_PRICE)
         ) {
             return;
@@ -74,7 +78,7 @@ class ProductSave implements ObserverInterface {
 
         $result = null;
 
-        if (($price = (float) $product->getData(ProductInterface::PRICE))
+        if (($price = (float) $product->getData($this->priceAttribute))
             && ($lowest_price = (float) $product->getData(Constants::ATTR_LOWEST_PRICE))
         ) {
             $result = $price / $lowest_price;

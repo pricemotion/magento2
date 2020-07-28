@@ -20,9 +20,23 @@
                 <field id="ean_attr" showInDefault="1" type="select">
                     <label>EAN</label>
                     <comment><![CDATA[Pricemotion looks for prices using your product's EAN codes. Make sure you have an EAN attribute defined, and select it here.]]></comment>
-                    <validate>validate-select</validate>
+                    <validate>required-entry validate-select</validate>
                     <source_model>Pricemotion\Magento2\Model\Config\Source\ProductAttributes</source_model>
                     <config_path>pricemotion/attributes/ean</config_path>
+                </field>
+                <field id="price_attr" showInDefault="1" type="select">
+                    <label>Price</label>
+                    <comment><![CDATA[This is the attribute that Pricemotion will update with its recommended price, if enabled, and the attribute that is used to calculate the <i>Price Difference</i>. Usually, you should select <i>Special Price</i> here. If this attribute is empty for a given product, the <i>List Price</i> attribute is used to calculate the <i>Price Difference</i>.]]></comment>
+                    <validate>required-entry validate-select</validate>
+                    <source_model>Pricemotion\Magento2\Model\Config\Source\ProductAttributes</source_model>
+                    <config_path>pricemotion/attributes/price</config_path>
+                </field>
+                <field id="list_price_attr" showInDefault="1" type="select">
+                    <label>List Price</label>
+                    <comment><![CDATA[This attribute is used to limit the maximum discount on the list price, if configured in price rules. This product will also be used to calculate the <i>Price Difference</i> if the <i>Price</i> attribute is not set. Usually, you should select <i>Price</i> here.]]></comment>
+                    <validate>validate-select</validate>
+                    <source_model>Pricemotion\Magento2\Model\Config\Source\ProductAttributes</source_model>
+                    <config_path>pricemotion/attributes/list_price</config_path>
                 </field>
             </group>
         </section>
