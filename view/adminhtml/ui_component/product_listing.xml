@@ -20,4 +20,15 @@
             </settings>
         </column>
     </columns>
+    <listingToolbar name="listing_top">
+        <massaction name="listing_massaction">
+            <action name="pricemotion_price_rules">
+                <settings>
+                    <url path="pricemotion/pricerules" />
+                    <type>pricemotion_pricerules</type>
+                    <label translate="true">Update Pricemotion price rules</label>
+                </settings>
+            </action>
+        </massaction>
+    </listingToolbar>
 </listing>
