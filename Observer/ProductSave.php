@@ -90,6 +90,9 @@ class ProductSave implements ObserverInterface {
     private function changed(Product $product, string ...$attributes) {
         $result = [];
         foreach ($attributes as $attribute) {
+            if (!$attribute) {
+                continue;
+            }
             if (!$product->hasData($attribute)) {
                 continue;
             }
