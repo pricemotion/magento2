@@ -13,19 +13,13 @@ function Pricemotion(rootSelector) {
     const settings = JSON.parse(root.getAttribute('data-settings'));
 
     const frame = document.createElement('iframe');
-    frame.classList.add('pricemotion-frame');
-    frame.src = settings.web_url + '/widget#' + encodeURIComponent(JSON.stringify({
-        token: settings.token,
-        ean: settings.ean,
-        settings: settings.settings
-    }));
+    frame.src = settings.widget_url;
     frame.style.width = '100%';
     frame.style.border = '0';
     frame.style.height = '250px';
     root.appendChild(frame);
 
-    const settingsInput = addInput('pricemotion_settings', JSON.stringify(settings.settings));
-    let updatedAtInput;
+    const inputs = {};
 
     window.addEventListener('message', function (e) {
         if (e.origin !== settings.web_origin) {
@@ -35,21 +29,21 @@ function Pricemotion(rootSelector) {
         if (message.type === 'setWidgetHeight') {
             frame.style.height = message.value + 'px';
         } else if (message.type === 'updateProductSettings') {
-            settingsInput.value = JSON.stringify(message.value);
-            if (!updatedAtInput) {
-                updatedAtInput = addInput('pricemotion_updated_at', '0');
-            }
+            setInput('pricemotion_settings', JSON.stringify(message.value));
+            setInput('pricemotion_updated_at', '0');
         }
     });
 
-    function addInput(name, value) {
-        const input = document.createElement('input');
-        input.name = 'product.' + name;
-        input.type = 'hidden';
-        input.value = value;
-        input.setAttribute('data-form-part', 'product_form');
-        root.appendChild(input);
-        return input;
+    function setInput(name, value) {
+        if (!inputs[name]) {
+            const input = document.createElement('input');
+            input.name = 'product.' + name;
+            input.type = 'hidden';
+            input.setAttribute('data-form-part', 'product_form');
+            root.appendChild(input);
+            inputs[name] = input;
+        }
+        inputs[name].value = value;
     }
 }
 

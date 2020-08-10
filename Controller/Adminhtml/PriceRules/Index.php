@@ -2,7 +2,6 @@
 namespace Pricemotion\Magento2\Controller\Adminhtml\PriceRules;
 
 use Magento\Backend\App\Action;
-use Magento\Catalog\Controller\Adminhtml\Product;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Ui\Component\MassAction\Filter;
