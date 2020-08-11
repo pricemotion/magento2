@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+* Interpret price difference filter values like they are displayed.
+
+
 ## 1.1.0 - 2020-08-11
 
 * Fix Pricemotion attribute and price updates.  This did not work in the initial release.
