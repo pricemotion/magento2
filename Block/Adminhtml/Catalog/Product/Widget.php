@@ -6,11 +6,11 @@ use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Registry;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
-use Magento\Framework\View\Element\Template;
+use Magento\Backend\Block\Template;
 use Magento\Csp\Model\Collector\DynamicCollector;
 use Magento\Csp\Model\Policy\FetchPolicy;
 
-abstract class Widget extends Template {
+abstract class Widget extends \Magento\Backend\Block\Widget {
     protected $_template = 'widget.phtml';
     protected $config;
     private $coreRegistry;
@@ -37,12 +37,17 @@ abstract class Widget extends Template {
     }
 
     protected function _beforeToHtml() {
-        $this->assign('settings', [
-            'web_origin' => $this->getOrigin(Constants::getWebUrl()),
-            'widget_url' => Constants::getWebUrl() . $this->getWidgetPath() . '#' . json_encode($this->getWidgetParameters()),
-        ]);
+        $this->assign('settings', $this->getSettings());
 
         return parent::_beforeToHtml();
+    }
+
+    protected function getSettings(): array {
+        return [
+            'web_origin' => $this->getOrigin(Constants::getWebUrl()),
+            'widget_url' => Constants::getWebUrl() . $this->getWidgetPath() . '#' . json_encode($this->getWidgetParameters()),
+            'form_key' => $this->getFormKey(),
+        ];
     }
 
     protected function getProduct(): Product {
