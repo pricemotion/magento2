@@ -61,10 +61,20 @@ function Pricemotion(rootSelector) {
             && isValid === false
         ) {
             e.stopImmediatePropagation();
-            root.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-            });
+
+            let delay = 0;
+
+            try {
+                root.closest('[data-index]').querySelector('[data-state-collapsible="closed"]').click();
+                delay = 250;
+            } catch (e) {}
+
+            setTimeout(() => {
+                root.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                });
+            }, delay);
         }
     }, true);
 

@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Interpret price difference filter values like they are displayed.
+* Open Pricemotion tab on product edit page if input is invalid.
 
 
 ## 1.1.0 - 2020-08-11
