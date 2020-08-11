@@ -45,7 +45,11 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
     protected function getSettings(): array {
         return [
             'web_origin' => $this->getOrigin(Constants::getWebUrl()),
-            'widget_url' => Constants::getWebUrl() . $this->getWidgetPath() . '#' . json_encode($this->getWidgetParameters()),
+            'widget_url' =>
+                Constants::getWebUrl() .
+                $this->getWidgetPath() .
+                '?' . http_build_query(['assetVersion' => Constants::getAssetVersion()]) .
+                '#' . json_encode($this->getWidgetParameters()),
             'form_key' => $this->getFormKey(),
         ];
     }
