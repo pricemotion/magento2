@@ -11,3 +11,5 @@ package="$(bin/package)"
 bsdtar xf "$package" -C www/app/code/Pricemotion/Magento2
 
 bin/clear-magento-cache
+
+docker-compose restart web

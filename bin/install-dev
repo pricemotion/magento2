@@ -8,3 +8,5 @@ rm -rf www/app/code/Pricemotion/Magento2
 ln -sfn ../../../.. www/app/code/Pricemotion/Magento2
 
 bin/clear-magento-cache
+
+docker-compose restart web
