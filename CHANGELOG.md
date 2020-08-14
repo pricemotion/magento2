@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.1 - 2020-08-14
 
 * Interpret price difference filter values like they are displayed.
 * Open Pricemotion tab on product edit page if input is invalid.
