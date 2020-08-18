@@ -1,3 +1,13 @@
 #!/bin/bash
 
-exec docker exec -it magento2_web_1 sudo -u apache php -d memory_limit=-1 /data/www/bin/magento "$@"
+set -euo pipefail
+
+opts=( -i )
+
+if [[ -t 1 ]]; then
+	opts+=( -t )
+fi
+
+exec docker exec "${opts[@]}" \
+	magento2_web_1 \
+	sudo -u apache php -d memory_limit=-1 /data/www/bin/magento "$@"
