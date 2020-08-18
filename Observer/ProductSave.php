@@ -87,7 +87,7 @@ class ProductSave implements ObserverInterface {
         $product->setData(Constants::ATTR_LOWEST_PRICE_RATIO, $result);
     }
 
-    private function changed(Product $product, string ...$attributes) {
+    private function changed(Product $product, ?string ...$attributes) {
         $result = [];
         foreach ($attributes as $attribute) {
             if (!$attribute) {
