@@ -9,13 +9,17 @@ docker-compose down
 
 rm -rf www
 
-composer create-project \
+php -d memory_limit=-1 "$(which composer)" create-project \
 	--ignore-platform-reqs \
 	--repository-url=https://repo.magento.com/ \
 	"magento/project-community-edition=$magento_version" \
 	www
 
 docker-compose up -d
+
+while ! mysql -h "$(docker-ip magento2_mariadb_1)" -e "SELECT 1" >/dev/null; do
+	sleep 0.5
+done
 
 bin/magento setup:install \
 	--base-url=http://pricemotion-magento2.test \
