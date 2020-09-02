@@ -9,7 +9,7 @@ docker-compose down
 
 rm -rf www
 
-php -d memory_limit=-1 "$(which composer)" create-project \
+COMPOSER_MEMORY_LIMIT=-1 composer create-project \
 	--ignore-platform-reqs \
 	--repository-url=https://repo.magento.com/ \
 	"magento/project-community-edition=$magento_version" \
