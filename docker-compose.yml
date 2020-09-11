@@ -13,6 +13,8 @@ services:
     networks:
       default:
         ipv4_address: 172.21.1.2
+    environment:
+      PRICEMOTION_DEVELOPMENT: 'yes'
 
   mariadb:
     image: mariadb:10.1.45
