@@ -10,3 +10,5 @@ ln -sfn ../../../.. www/app/code/Pricemotion/Magento2
 bin/clear-magento-cache
 
 docker-compose restart web
+
+bin/magento setup:upgrade
