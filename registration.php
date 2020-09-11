@@ -6,6 +6,6 @@ ComponentRegistrar::register(
     'Pricemotion_Magento2',
     isset($file)
     && realpath($file) == __FILE__
-    && !empty($_SERVER['PRICEMOTION_DEVELOPMENT']) ?
+    && getenv('PRICEMOTION_DEVELOPMENT') ?
     dirname($file) : __DIR__
 );

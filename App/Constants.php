@@ -53,7 +53,7 @@ class Constants {
     }
 
     private static function isDevelopmentVersion() {
-        return !empty($_SERVER['PRICEMOTION_DEVELOPMENT']);
+        return !!getenv('PRICEMOTION_DEVELOPMENT');
     }
 
 }
