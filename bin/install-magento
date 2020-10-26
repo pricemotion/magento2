@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-magento_version='2.3.4'
+magento_version='2.3.6'
 
 docker-compose down
 
