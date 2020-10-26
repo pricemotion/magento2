@@ -10,4 +10,6 @@ fi
 
 exec docker exec "${opts[@]}" \
 	magento2_web_1 \
-	sudo -u apache php -d memory_limit=-1 /data/www/bin/magento "$@"
+	sudo -u apache \
+	env PRICEMOTION_DEVELOPMENT=yes \
+	php -d memory_limit=-1 /data/www/bin/magento "$@"
