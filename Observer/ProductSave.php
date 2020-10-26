@@ -68,7 +68,7 @@ class ProductSave implements ObserverInterface {
         $this->setLowestPriceRatio($product);
     }
 
-    private function setLowestPriceRatio(Product $product) {
+    public function setLowestPriceRatio(Product $product) {
         if (!$this->priceAttribute
             || !$product->hasData($this->priceAttribute)
             || !$product->hasData(Constants::ATTR_LOWEST_PRICE)

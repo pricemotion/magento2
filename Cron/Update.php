@@ -3,7 +3,7 @@ namespace Pricemotion\Magento2\Cron;
 
 use Magento\Catalog\Api\Data\CostInterface;
 use Magento\Catalog\Model\Product;
-use Magento\Catalog\Model\ResourceModel\Product as ProductResourceModel;
+use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
@@ -12,6 +12,7 @@ use Pricemotion\Magento2\App\PricemotionClient;
 use Pricemotion\Magento2\App\PriceRule;
 use Pricemotion\Magento2\App\Product as PricemotionProduct;
 use Pricemotion\Magento2\Logger\Logger;
+use Pricemotion\Magento2\Observer\ProductSave;
 
 class Update {
     private const UPDATE_INTERVAL = 3600 * 12;
@@ -24,21 +25,24 @@ class Update {
     private $eanAttribute;
     private $priceAttribute;
     private $listPriceAttribute;
-    private $productResourceModel;
     private $ignoreUpdatedAt = false;
+    private $productAction;
+    private $productSaveObserver;
 
     public function __construct(
         Logger $logger,
         CollectionFactory $product_collection_factory,
         Config $config,
         PricemotionClient $pricemotion_client,
-        ProductResourceModel $product_resource_model
+        Action $product_action,
+        ProductSave $product_save_observer
     ) {
         $this->logger = $logger;
         $this->productCollectionFactory = $product_collection_factory;
         $this->config = $config;
         $this->pricemotion = $pricemotion_client;
-        $this->productResourceModel = $product_resource_model;
+        $this->productAction = $product_action;
+        $this->productSaveObserver = $product_save_observer;
     }
 
     public function setIgnoreUpdatedAt(bool $value): void {
@@ -128,24 +132,37 @@ class Update {
             return;
         }
 
-        $this->adjustPrice($product, $pricemotion_product);
+        $update = [
+            Constants::ATTR_LOWEST_PRICE => $pricemotion_product->getLowestPrice(),
+            Constants::ATTR_UPDATED_AT => microtime(true),
+        ];
 
-        $product->setData(Constants::ATTR_LOWEST_PRICE, $pricemotion_product->getLowestPrice());
+        if (($new_price = $this->getNewPrice($product, $pricemotion_product)) !== null) {
+            $update[$this->priceAttribute] = $new_price;
+        }
 
-        $product->setData(Constants::ATTR_UPDATED_AT, microtime(true));
+        foreach ($update as $attr => $value) {
+            $product->setData($attr, $value);
+        }
 
-        $this->productResourceModel->save($product);
+        $this->productSaveObserver->setLowestPriceRatio($product);
+
+        if ($product->hasData(Constants::ATTR_LOWEST_PRICE_RATIO)) {
+            $update[Constants::ATTR_LOWEST_PRICE_RATIO] = $product->getData(Constants::ATTR_LOWEST_PRICE_RATIO);
+        }
+
+        $this->productAction->updateAttributes([$product->getId()], $update, $product->getStoreId());
     }
 
-    private function adjustPrice(Product $product, PricemotionProduct $pricemotion_product): void {
+    private function getNewPrice(Product $product, PricemotionProduct $pricemotion_product): ?float {
         $settings = $product->getData(Constants::ATTR_SETTINGS);
         if (!$settings) {
-            return;
+            return null;
         }
 
         $settings = json_decode($settings, true);
         if (!is_array($settings)) {
-            return;
+            return null;
         }
 
         try {
@@ -155,12 +172,12 @@ class Update {
                 "Invalid price rule for product %d: %s",
                 $product->getId(), $e->getMessage()
             ));
-            return;
+            return null;
         }
 
         $new_price = $rule->calculate($pricemotion_product);
         if (!$new_price) {
-            return;
+            return null;
         }
 
         if (!$this->priceAttribute) {
@@ -168,7 +185,7 @@ class Update {
                 "Prices rules are configured for product %d, but no price attribute is configured",
                 $product->getId()
             ));
-            return;
+            return null;
         }
 
         if (!empty($settings['protectMargin'])) {
@@ -179,7 +196,7 @@ class Update {
                     "Margin protection enabled, but no cost price found for product %d",
                     $product->getId()
                 ));
-                return;
+                return null;
             }
             $minimum_price = round($cost * (1 + $minimum_margin / 100), 2);
             if ($new_price < $minimum_price) {
@@ -216,7 +233,7 @@ class Update {
         }
 
         if (abs($product->getData($this->priceAttribute) - $new_price) < 0.005) {
-            return;
+            return null;
         }
 
         $this->logger->info(sprintf(
@@ -227,6 +244,6 @@ class Update {
             get_class($rule)
         ));
 
-        $product->setData($this->priceAttribute, $new_price);
+        return $new_price;
     }
 }
