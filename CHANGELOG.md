@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.5 - 2020-10-26
+
+* Explicitly save only attributes changed during price update.
+
 ## 1.1.4 - 2020-09-02
 
 * Fix version detection when installed directly from GitHub using Composer.
