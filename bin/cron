@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+while true; do
+    ./bin/magento cron:run | TZ=UTC gawk '{print strftime("%Y-%m-%dT%H:%M:%SZ ") $0}'
+done
