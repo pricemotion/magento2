@@ -5,6 +5,13 @@ cd "$(dirname "$0")/.."
 
 magento_version='2.3.6'
 
+if [[ $# -eq 1 ]]; then
+	magento_version="$1"
+elif [[ $# -gt 1 ]]; then
+	echo "Usage: $0 [version]" >&2
+	exit 1
+fi
+
 docker-compose down
 
 rm -rf www
@@ -20,6 +27,11 @@ docker-compose up -d
 while ! mysql -h "$(docker-ip magento2_mariadb_1)" -e "SELECT 1" >/dev/null; do
 	sleep 0.5
 done
+
+mysql -h "$(docker-ip magento2_mariadb_1)" <<-EOF
+	DROP DATABASE IF EXISTS magento;
+	CREATE DATABASE magento;
+EOF
 
 bin/magento setup:install \
 	--base-url=http://pricemotion-magento2.test \
