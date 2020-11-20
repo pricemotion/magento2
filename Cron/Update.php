@@ -171,7 +171,7 @@ class Update {
         }
 
         $settings = json_decode($settings, true);
-        if (!is_array($settings)) {
+        if (!is_array($settings) || !$settings) {
             return null;
         }
 
