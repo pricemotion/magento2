@@ -33,6 +33,15 @@ mysql -h "$(docker-ip magento2_mariadb_1)" <<-EOF
 	CREATE DATABASE magento;
 EOF
 
+if [[ -f  ~/.config/composer/auth.json ]]; then
+	mkdir -p www/var/composer_home
+	cat ~/.config/composer/auth.json |
+		jq '. | map_values(with_entries(select(.key == "repo.magento.com")))' \
+		> www/var/composer_home/auth.json
+fi
+
+bin/magento sampledata:deploy
+
 bin/magento setup:install \
 	--base-url=http://pricemotion-magento2.test \
 	--db-host=mariadb \
