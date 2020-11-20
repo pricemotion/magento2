@@ -10,13 +10,16 @@ This extension integrates your Magento 2 store with
 * [Installation & user
   guide](https://docs.google.com/document/d/e/2PACX-1vS8n18Itwb_BeQw_7UvWTTOcpl_iXJLARzak6MPqX7JlNjGOoaS-WH9Cbyhroy3f9YInV3GbtvtsVSS/pub)
 
-## Direct installation from Github
+We recommend installing the extension via GitHub, because Magento Marketplace
+releases are frequently delayed by Magento's review.
+
+## Direct installation from GitHub
 
 In order to install the development version, or a new version that has not yet
 been published on Magento Marketplace, you may use Composer to directly install
-the extension from Github.
+the extension from GitHub.
 
-Edit your `composer.json` and add the Github repository to the top of the
+Edit your `composer.json` and add the GitHub repository to the top of the
 `repositories` section:
 
 ~~~
