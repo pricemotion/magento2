@@ -15,6 +15,7 @@ RUN apk add --no-cache \
     php7-curl \
     php7-dev \
     php7-dom \
+    php7-fileinfo \
     php7-gd \
     php7-iconv \
     php7-intl \
