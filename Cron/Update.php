@@ -16,7 +16,6 @@ use Pricemotion\Magento2\Observer\ProductSave;
 
 class Update {
     private const UPDATE_INTERVAL = 3600 * 12;
-    private const MAX_DURATION = 55;
 
     private $logger;
     private $productCollectionFactory;
@@ -28,6 +27,7 @@ class Update {
     private $ignoreUpdatedAt = false;
     private $productAction;
     private $productSaveObserver;
+    private $timeLimit = 55;
 
     public function __construct(
         Logger $logger,
@@ -49,8 +49,16 @@ class Update {
         $this->ignoreUpdatedAt = $value;
     }
 
+    public function setTimeLimit(?int $time_limit): void {
+        $this->timeLimit = $time_limit;
+    }
+
     public function execute(): void {
-        $run_until = time() + self::MAX_DURATION;
+        if ($this->timeLimit === null) {
+            $run_until = null;
+        } else {
+            $run_until = time() + $this->timeLimit;
+        }
 
         $this->eanAttribute = $this->config->getEanAttribute();
         if (!$this->eanAttribute) {
@@ -98,7 +106,9 @@ class Update {
             $this->updateProduct($product);
             $processed++;
 
-            if (time() > $run_until) {
+            if ($run_until !== null
+                && time() > $run_until
+            ) {
                 $this->logger->info(sprintf("Ran out of time after processing %d products", $processed));
             }
         }

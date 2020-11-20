@@ -38,6 +38,7 @@ class Update extends Command {
     protected function execute(InputInterface $input, OutputInterface $output) {
         $this->state->setAreaCode(Area::AREA_CRONTAB);
         $this->logger->pushHandler(new StreamHandler(STDERR));
+        $this->job->setTimeLimit(null);
         if ($input->getOption('force')) {
             $this->job->setIgnoreUpdatedAt(true);
         }
