@@ -59,3 +59,5 @@ bin/magento setup:install \
 	--backend-frontname=admin
 
 bin/magento config:set dev/template/allow_symlink 1
+
+bin/magento cache:clean
