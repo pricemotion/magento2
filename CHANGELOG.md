@@ -4,6 +4,7 @@
 
 * Fix cron time limit.
 * Disable time limit when running via `pricemotion:update`.
+* Avoid trying to apply price rules if settings are empty.
 
 ## 1.1.5 - 2020-10-26
 
