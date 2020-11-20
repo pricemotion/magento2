@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+* Fix cron time limit.
+* Disable time limit when running via `pricemotion:update`.
+
 ## 1.1.5 - 2020-10-26
 
 * Explicitly save only attributes changed during price update.
