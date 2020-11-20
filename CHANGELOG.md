@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.6 - 2020-11-20
 
 * Fix cron time limit.
 * Disable time limit when running via `pricemotion:update`.
