@@ -58,7 +58,7 @@ class ProductSave implements ObserverInterface {
 
         if ($this->changed($product, $this->eanAttribute)) {
             $this->logger->debug(sprintf(
-                "EAN changed on product %d; resetting uptime timestamp and lowest price...",
+                "EAN changed on product %d; resetting update timestamp and lowest price...",
                 $product->getId()
             ));
             $product->setData(Constants::ATTR_UPDATED_AT, null);
