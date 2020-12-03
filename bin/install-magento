@@ -12,11 +12,30 @@ elif [[ $# -gt 1 ]]; then
 	exit 1
 fi
 
+retrieve() {
+	tmp="$(mktemp)"
+	if ! wget -O "$tmp" "$2" ||
+	   ! sha256sum --strict -c <<<"$3 $tmp"
+	then
+		rm -f "$tmp"
+		return $?
+	fi
+	mv "$tmp" "$1"
+}
+
+if [[ ! -f vendor/bin/composer ]]; then
+	mkdir -p vendor/bin
+	retrieve vendor/bin/composer \
+			 'https://getcomposer.org/download/1.10.17/composer.phar' \
+			 6fa00eba5103ce6750f94f87af8356e12cc45d5bbb11a140533790cf60725f1c
+	chmod +x vendor/bin/composer
+fi
+
 docker-compose stop web
 
 rm -rf www
 
-COMPOSER_MEMORY_LIMIT=-1 composer create-project \
+COMPOSER_MEMORY_LIMIT=-1 vendor/bin/composer create-project \
 	--ignore-platform-reqs \
 	--repository-url=https://repo.magento.com/ \
 	"magento/project-community-edition=$magento_version" \
