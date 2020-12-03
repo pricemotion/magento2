@@ -3,6 +3,7 @@ namespace Pricemotion\Magento2\Block\Adminhtml\Catalog\Product;
 
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\ObjectManager;
+use Magento\Framework\Locale\Resolver;
 use Magento\Framework\Registry;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
@@ -14,6 +15,7 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
     protected $_template = 'widget.phtml';
     protected $config;
     private $coreRegistry;
+    private $localeResolver;
 
     abstract protected function getWidgetPath(): string;
 
@@ -23,10 +25,12 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
         Template\Context $context,
         Registry $coreRegistry,
         Config $config,
+        Resolver $localeResolver,
         array $data = []
     ) {
         $this->coreRegistry = $coreRegistry;
         $this->config = $config;
+        $this->localeResolver = $localeResolver;
 
         if (class_exists(DynamicCollector::class)) {
             $csp = ObjectManager::getInstance()->get(DynamicCollector::class);
@@ -43,13 +47,16 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
     }
 
     protected function getSettings(): array {
+        $parameters = $this->getWidgetParameters();
+        $parameters->locale = $this->localeResolver->getLocale();
+
         return [
             'web_origin' => $this->getOrigin(Constants::getWebUrl()),
             'widget_url' =>
                 Constants::getWebUrl() .
                 $this->getWidgetPath() .
                 '?' . http_build_query(['assetVersion' => Constants::getAssetVersion()]) .
-                '#' . json_encode($this->getWidgetParameters()),
+                '#' . json_encode($parameters),
             'form_key' => $this->getFormKey(),
         ];
     }
