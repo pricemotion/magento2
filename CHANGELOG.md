@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.7 - 2020-12-03
+
+* Add `--ean` option to `pricemotion:update` command allowing specifying
+  specific products to update.
+* Log all product attributes to the console when using `pricemotion:update`.
+* Prevent "Got 0 products for update" message from being logged.
+
 ## 1.1.6 - 2020-11-20
 
 * Fix cron time limit.
