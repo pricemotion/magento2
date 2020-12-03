@@ -32,6 +32,7 @@ class Update extends Command {
     public function configure() {
         $this->setDefinition(new InputDefinition([
             new InputOption('force', 'f', InputOption::VALUE_NONE),
+            new InputOption('ean', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY),
         ]));
     }
 
@@ -42,6 +43,10 @@ class Update extends Command {
         if ($input->getOption('force')) {
             $this->job->setIgnoreUpdatedAt(true);
         }
+        if ($input->getOption('ean')) {
+            $this->job->setEanFilter($input->getOption('ean'));
+        }
         $this->job->execute();
+        return 0;
     }
 }

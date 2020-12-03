@@ -28,6 +28,7 @@ class Update {
     private $productAction;
     private $productSaveObserver;
     private $timeLimit = 55;
+    private $eanFilter = null;
 
     public function __construct(
         Logger $logger,
@@ -53,6 +54,10 @@ class Update {
         $this->timeLimit = $time_limit;
     }
 
+    public function setEanFilter(?array $eanFilter): void {
+        $this->eanFilter = $eanFilter;
+    }
+
     public function execute(): void {
         if ($this->timeLimit === null) {
             $run_until = null;
@@ -73,7 +78,14 @@ class Update {
 
         $product_collection->addAttributeToFilter($this->eanAttribute, ['neq' => '']);
 
-        if (!$this->ignoreUpdatedAt) {
+        if ($this->eanFilter !== null) {
+            $product_collection->addAttributeToFilter($this->eanAttribute, array_map(function ($ean) {
+                return ['eq' => $ean];
+            }, $this->eanFilter));
+            if ($this->ignoreUpdatedAt) {
+                $this->logger->warning("The `force' option is superfluous when selecting EANs to be updated");
+            }
+        } elseif (!$this->ignoreUpdatedAt) {
             $product_collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT, 'left');
             $product_collection->addAttributeToFilter(Constants::ATTR_UPDATED_AT, [
                 ['null' => true],
@@ -97,13 +109,25 @@ class Update {
         /** @var Product[] $products */
         $products = $product_collection->getItems();
 
+        if (!$products) {
+            $this->logger->debug("There are no products that need updating");
+            return;
+        }
+
         $this->logger->info(sprintf("Got %d products for update", sizeof($products)));
 
         shuffle($products);
 
         $processed = 0;
         foreach ($products as $product) {
+            $this->logger->debug(sprintf(
+                "Product %d: %s",
+                $product->getId(),
+                json_encode($product->getData(), JSON_UNESCAPED_UNICODE, JSON_PARTIAL_OUTPUT_ON_ERROR)
+            ));
+
             $this->updateProduct($product);
+
             $processed++;
 
             if ($run_until !== null
@@ -243,6 +267,12 @@ class Update {
         }
 
         if (abs($product->getData($this->priceAttribute) - $new_price) < 0.005) {
+            $this->logger->debug(sprintf(
+                "Would adjust product %d price to %.2f according to %s, but it is already there",
+                $product->getId(),
+                $new_price,
+                get_class($rule)
+            ));
             return null;
         }
 
