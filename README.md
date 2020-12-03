@@ -38,7 +38,7 @@ composer require pricemotion/module-pricemotion
 
 ~~~
 # If you have installed the extension previously
-composer upgrade pricemotion/module-pricemotion
+composer update pricemotion/module-pricemotion
 ~~~
 
 Lastly run the Magento update process:
