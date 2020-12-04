@@ -74,6 +74,10 @@ class Update {
         $this->priceAttribute = $this->config->getPriceAttribute();
         $this->listPriceAttribute = $this->config->getListPriceAttribute();
 
+        $this->logger->debug("EAN attribute: {$this->eanAttribute}");
+        $this->logger->debug("Price attribute: {$this->priceAttribute}");
+        $this->logger->debug("List price attribute: {$this->listPriceAttribute}");
+
         $product_collection = $this->productCollectionFactory->create();
 
         $product_collection->addAttributeToFilter($this->eanAttribute, ['neq' => '']);
