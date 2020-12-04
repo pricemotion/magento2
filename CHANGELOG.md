@@ -4,6 +4,8 @@
 
 * Log EAN, price, list price attribute settings during `pricemotion:update`
   command.
+* Log manual update runs so they can be distinguished from cron runs in the
+  logs.
 
 ## 1.1.7 - 2020-12-03
 
