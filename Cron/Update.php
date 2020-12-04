@@ -139,7 +139,7 @@ class Update {
         $products = $product_collection->getItems();
 
         if (!$products) {
-            $this->logger->debug("There are no products that need updating");
+            $this->logger->info("There are no products that need updating");
             return;
         }
 
