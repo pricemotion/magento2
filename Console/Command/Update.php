@@ -46,7 +46,9 @@ class Update extends Command {
         if ($input->getOption('ean')) {
             $this->job->setEanFilter($input->getOption('ean'));
         }
+        $this->logger->info(sprintf("Starting manual update run: %s", $input));
         $this->job->execute();
+        $this->logger->info("Completed manual update run");
         return 0;
     }
 }
