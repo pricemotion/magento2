@@ -1,7 +1,10 @@
 # Changelog
 
-## Unreleased
+## 1.1.9 - 2020-12-04
 
+* Mark products as updated even if API errors occur.  This is to prevent the
+  same products from being updated every minute, even when the results don't
+  change.
 * End cron job when running out of time.
 
 ## 1.1.8 - 2020-12-04
