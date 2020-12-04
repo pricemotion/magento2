@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* End cron job when running out of time.
+
 ## 1.1.8 - 2020-12-04
 
 * Emulate default store view in cronjob.

@@ -163,6 +163,7 @@ class Update {
                 && time() > $run_until
             ) {
                 $this->logger->info(sprintf("Ran out of time after processing %d products", $processed));
+                return;
             }
         }
     }
