@@ -5,6 +5,9 @@ use Magento\Catalog\Api\Data\CostInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Framework\App\Area;
+use Magento\Store\Model\App\Emulation;
+use Magento\Store\Model\StoreManagerInterface;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\App\EAN;
@@ -29,6 +32,8 @@ class Update {
     private $productSaveObserver;
     private $timeLimit = 55;
     private $eanFilter = null;
+    private $storeManager;
+    private $emulation;
 
     public function __construct(
         Logger $logger,
@@ -36,7 +41,9 @@ class Update {
         Config $config,
         PricemotionClient $pricemotion_client,
         Action $product_action,
-        ProductSave $product_save_observer
+        ProductSave $product_save_observer,
+        StoreManagerInterface $store_manager,
+        Emulation $emulation
     ) {
         $this->logger = $logger;
         $this->productCollectionFactory = $product_collection_factory;
@@ -44,6 +51,8 @@ class Update {
         $this->pricemotion = $pricemotion_client;
         $this->productAction = $product_action;
         $this->productSaveObserver = $product_save_observer;
+        $this->storeManager = $store_manager;
+        $this->emulation = $emulation;
     }
 
     public function setIgnoreUpdatedAt(bool $value): void {
@@ -59,6 +68,22 @@ class Update {
     }
 
     public function execute(): void {
+        $default_store = $this->storeManager->getDefaultStoreView();
+        if (!$default_store) {
+            $this->logger->error("No default store view is configured; aborting");
+            return;
+        }
+
+        $this->emulation->startEnvironmentEmulation($default_store->getId(), Area::AREA_ADMINHTML);
+
+        try {
+            $this->doExecute();
+        } finally {
+            $this->emulation->stopEnvironmentEmulation();
+        }
+    }
+
+    private function doExecute(): void {
         if ($this->timeLimit === null) {
             $run_until = null;
         } else {
