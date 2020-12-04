@@ -169,6 +169,19 @@ class Update {
     }
 
     private function updateProduct(Product $product): void {
+        $update = $this->getUpdateData($product);
+
+        if ($update) {
+            $this->logger->info(sprintf(
+                "Update product %d: %s",
+                $product->getId(),
+                json_encode($update, JSON_PARTIAL_OUTPUT_ON_ERROR)
+            ));
+            $this->productAction->updateAttributes([$product->getId()], $update, $product->getStoreId());
+        }
+    }
+
+    private function getUpdateData(Product $product): array {
         $ean_string = $product->getData($this->eanAttribute);
 
         try {
@@ -178,7 +191,7 @@ class Update {
                 "Skipping product %d with invalid EAN '%s': %s",
                 $product->getId(), $ean_string, $e->getMessage()
             ));
-            return;
+            return [];
         }
 
         $this->logger->info(sprintf(
@@ -193,7 +206,7 @@ class Update {
                 "Could not get Pricemotion data for product %d with EAN %s: %s",
                 $product->getId(), $ean->toString(), $e->getMessage()
             ));
-            return;
+            return [Constants::ATTR_UPDATED_AT => microtime(true)];
         }
 
         $update = [
@@ -215,7 +228,7 @@ class Update {
             $update[Constants::ATTR_LOWEST_PRICE_RATIO] = $product->getData(Constants::ATTR_LOWEST_PRICE_RATIO);
         }
 
-        $this->productAction->updateAttributes([$product->getId()], $update, $product->getStoreId());
+        return $update;
     }
 
     private function getNewPrice(Product $product, PricemotionProduct $pricemotion_product): ?float {
