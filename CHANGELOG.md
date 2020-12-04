@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+* Log EAN, price, list price attribute settings during `pricemotion:update`
+  command.
+
 ## 1.1.7 - 2020-12-03
 
 * Add `--ean` option to `pricemotion:update` command allowing specifying
