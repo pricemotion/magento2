@@ -3,7 +3,7 @@ namespace Pricemotion\Magento2\Block\Adminhtml\Catalog\Product;
 
 use Magento\Catalog\Model\Product;
 use Magento\Framework\App\ObjectManager;
-use Magento\Framework\Locale\Resolver;
+use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\Registry;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
@@ -25,7 +25,7 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
         Template\Context $context,
         Registry $coreRegistry,
         Config $config,
-        Resolver $localeResolver,
+        ResolverInterface $localeResolver,
         array $data = []
     ) {
         $this->coreRegistry = $coreRegistry;
