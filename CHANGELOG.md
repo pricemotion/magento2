@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.10 - 2020-12-04
+
+* Use user locale for Pricemotion widgets in admin interface. (Dutch and English
+  languages are supported.)
+
 ## 1.1.9 - 2020-12-04
 
 * Mark products as updated even if API errors occur.  This is to prevent the
