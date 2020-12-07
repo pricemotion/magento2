@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.11 - 2020-12-07
+
+* Fix PriceRules component constructor. This restores the mass price rule update
+  functionality and unbreaks DI compilation.
+
 ## 1.1.10 - 2020-12-04
 
 * Use user locale for Pricemotion widgets in admin interface. (Dutch and English
