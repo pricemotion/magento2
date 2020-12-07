@@ -3,4 +3,11 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-find www/var/cache www/generated -type f -delete
+clean() {
+	if [[ -d $1 ]]; then
+		find "$1" -type f -delete
+	fi
+}
+
+clean www/var/cache
+clean www/generated
