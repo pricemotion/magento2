@@ -3,7 +3,26 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-version="$(git describe --tags --match 'v*')"
+version=
+
+while [[ $# -gt 0 ]]; do
+	case $1 in
+	--version)
+		shift
+		version="$1"
+		shift
+		;;
+	*)
+		echo "Usage: $0 [--version VERSION]" >&2
+		exit 1
+		;;
+	esac
+done
+
+if [[ $version = "" ]]; then
+	version="$(git describe --tags --match 'v*')"
+fi
+
 version="${version#v}"
 
 out="$PWD/dist/pricemotion-magento2-$version.zip"
