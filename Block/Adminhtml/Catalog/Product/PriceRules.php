@@ -1,6 +1,7 @@
 <?php
 namespace Pricemotion\Magento2\Block\Adminhtml\Catalog\Product;
 
+use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\Registry;
 use Magento\Backend\Block\Template;
 use Pricemotion\Magento2\App\Config;
@@ -15,10 +16,11 @@ class PriceRules extends Widget {
         Template\Context $context,
         Registry $coreRegistry,
         Config $config,
+        ResolverInterface $locale_resolver,
         array $data = []
     ) {
         $this->helper = $helper;
-        parent::__construct($context, $coreRegistry, $config, $data);
+        parent::__construct($context, $coreRegistry, $config, $locale_resolver, $data);
     }
 
     protected function getSettings(): array {
