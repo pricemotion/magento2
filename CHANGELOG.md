@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.12 - 2020-12-09
+
+* Reindex product after update. This should prevent stale prices from being
+  displayed on the storefront.
+
 ## 1.1.11 - 2020-12-07
 
 * Fix PriceRules component constructor. This restores the mass price rule update
