@@ -2,6 +2,7 @@
 namespace Pricemotion\Magento2\Cron;
 
 use Magento\Catalog\Api\Data\CostInterface;
+use Magento\Catalog\Model\Indexer\Product\Full as FullProductIndexer;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
@@ -34,6 +35,7 @@ class Update {
     private $eanFilter = null;
     private $storeManager;
     private $emulation;
+    private $productIndexer;
 
     public function __construct(
         Logger $logger,
@@ -43,7 +45,8 @@ class Update {
         Action $product_action,
         ProductSave $product_save_observer,
         StoreManagerInterface $store_manager,
-        Emulation $emulation
+        Emulation $emulation,
+        FullProductIndexer $product_indexer
     ) {
         $this->logger = $logger;
         $this->productCollectionFactory = $product_collection_factory;
@@ -53,6 +56,7 @@ class Update {
         $this->productSaveObserver = $product_save_observer;
         $this->storeManager = $store_manager;
         $this->emulation = $emulation;
+        $this->productIndexer = $product_indexer;
     }
 
     public function setIgnoreUpdatedAt(bool $value): void {
@@ -178,6 +182,7 @@ class Update {
                 json_encode($update, JSON_PARTIAL_OUTPUT_ON_ERROR)
             ));
             $this->productAction->updateAttributes([$product->getId()], $update, $product->getStoreId());
+            $this->productIndexer->executeRow($product->getId());
         }
     }
 
