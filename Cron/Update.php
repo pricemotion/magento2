@@ -2,11 +2,12 @@
 namespace Pricemotion\Magento2\Cron;
 
 use Magento\Catalog\Api\Data\CostInterface;
-use Magento\Catalog\Model\Indexer\Product\Full as FullProductIndexer;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\Area;
+use Magento\Framework\Indexer\AbstractProcessor;
+use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
 use Pricemotion\Magento2\App\Config;
@@ -20,6 +21,11 @@ use Pricemotion\Magento2\Observer\ProductSave;
 
 class Update {
     private const UPDATE_INTERVAL = 3600 * 12;
+
+    private const INDEXER_IDS = [
+        \Magento\Catalog\Model\Indexer\Product\Price\Processor::INDEXER_ID,
+        \Magento\Catalog\Model\Indexer\Product\Eav\Processor::INDEXER_ID,
+    ];
 
     private $logger;
     private $productCollectionFactory;
@@ -35,7 +41,7 @@ class Update {
     private $eanFilter = null;
     private $storeManager;
     private $emulation;
-    private $productIndexer;
+    private $indexerRegistry;
 
     public function __construct(
         Logger $logger,
@@ -46,7 +52,7 @@ class Update {
         ProductSave $product_save_observer,
         StoreManagerInterface $store_manager,
         Emulation $emulation,
-        FullProductIndexer $product_indexer
+        IndexerRegistry $indexer_registry
     ) {
         $this->logger = $logger;
         $this->productCollectionFactory = $product_collection_factory;
@@ -56,7 +62,7 @@ class Update {
         $this->productSaveObserver = $product_save_observer;
         $this->storeManager = $store_manager;
         $this->emulation = $emulation;
-        $this->productIndexer = $product_indexer;
+        $this->indexerRegistry = $indexer_registry;
     }
 
     public function setIgnoreUpdatedAt(bool $value): void {
@@ -182,7 +188,11 @@ class Update {
                 json_encode($update, JSON_PARTIAL_OUTPUT_ON_ERROR)
             ));
             $this->productAction->updateAttributes([$product->getId()], $update, $product->getStoreId());
-            $this->productIndexer->executeRow($product->getId());
+            foreach (self::INDEXER_IDS as $indexer_id) {
+                /** @var AbstractProcessor $indexer */
+                $indexer = $this->indexerRegistry->get($indexer_id);
+                $indexer->reindexRow($product->getId(), true);
+            }
         }
     }
 
