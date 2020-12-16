@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.13 - 2020-12-16
+
+* Trigger price, attribute indexers even if indexes run on schedule.
+
 ## 1.1.12 - 2020-12-09
 
 * Reindex product after update. This should prevent stale prices from being
