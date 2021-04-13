@@ -17,7 +17,9 @@ class Factory {
             throw new \InvalidArgumentException("Invalid price rule: {$data['rule']}");
         }
         $class = new \ReflectionClass(self::RULE_CLASSES[$data['rule']]);
-        if ($class->getConstructor()->getNumberOfRequiredParameters() == 0) {
+        if (!$class->getConstructor()
+            || $class->getConstructor()->getNumberOfRequiredParameters() == 0
+        ) {
             $rule = $class->newInstance();
         } elseif (!isset($data[$data['rule']])) {
             throw new \InvalidArgumentException("Required parameter missing for rule: {$data['rule']}");
