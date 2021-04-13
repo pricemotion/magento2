@@ -1,6 +1,10 @@
 <?php
 use Magento\Framework\Component\ComponentRegistrar;
 
+if (!class_exists(ComponentRegistrar::class)) {
+    return;
+}
+
 ComponentRegistrar::register(
     ComponentRegistrar::MODULE,
     'Pricemotion_Magento2',
