@@ -1,0 +1,14 @@
+* Use user locale for Pricemotion widgets in admin interface. (Dutch and English languages are supported.)
+* Mark products as updated even if API errors occur.  This is to prevent the same products from being updated every minute, even when the results don't change.
+* End cron job when running out of time.
+* Emulate default store view in cronjob.
+* Log EAN, price, list price attribute settings during pricemotion:update command.
+* Log manual update runs so they can be distinguished from cron runs in the logs.
+* Log "no products need updating" so that cron job execution can be verified.
+* Add --ean option to pricemotion:update command allowing specifying specific products to update.
+* Log all product attributes to the console when using pricemotion:update.
+* Prevent "Got 0 products for update" message from being logged.
+* Fix cron time limit.
+* Disable time limit when running via pricemotion:update.
+* Avoid trying to apply price rules if settings are empty.
+* Explicitly save only attributes changed during price update.

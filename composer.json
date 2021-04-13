@@ -16,5 +16,8 @@
         "psr-4": {
             "Pricemotion\\Magento2\\": ""
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9"
     }
 }
