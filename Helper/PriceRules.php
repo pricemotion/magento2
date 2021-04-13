@@ -2,13 +2,12 @@
 namespace Pricemotion\Magento2\Helper;
 
 use Magento\Backend\Model\Session;
-use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 
 class PriceRules {
-
     private $session;
+
     private $product_collection_factory;
 
     public function __construct(
@@ -44,5 +43,4 @@ class PriceRules {
             ->create()
             ->addIdFilter($productsIds);
     }
-
 }

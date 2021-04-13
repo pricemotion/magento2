@@ -1,14 +1,13 @@
 <?php
 namespace Pricemotion\Magento2\Block\Adminhtml\Catalog\Product;
 
+use Magento\Backend\Block\Template;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\Registry;
-use Magento\Backend\Block\Template;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\Helper\PriceRules as Helper;
 
 class PriceRules extends Widget {
-
     private $helper;
 
     public function __construct(
@@ -64,5 +63,4 @@ class PriceRules extends Widget {
 
         parent::_prepareLayout();
     }
-
 }

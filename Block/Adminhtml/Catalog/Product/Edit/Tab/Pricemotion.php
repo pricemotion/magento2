@@ -5,7 +5,6 @@ use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\Block\Adminhtml\Catalog\Product\Widget;
 
 class Pricemotion extends Widget {
-
     protected function getWidgetPath(): string {
         return '/widget';
     }
@@ -17,5 +16,4 @@ class Pricemotion extends Widget {
             'settings' => $this->getProduct()->getData(Constants::ATTR_SETTINGS) ?: new \stdClass(),
         ];
     }
-
 }

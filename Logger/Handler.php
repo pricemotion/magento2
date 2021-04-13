@@ -6,5 +6,6 @@ use Monolog\Logger;
 
 class Handler extends Base {
     protected $fileName = 'var/log/pricemotion.log';
+
     protected $loggerType = Logger::INFO;
 }

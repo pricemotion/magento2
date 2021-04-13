@@ -1,20 +1,23 @@
 <?php
 namespace Pricemotion\Magento2\Block\Adminhtml\Catalog\Product;
 
+use Magento\Backend\Block\Template;
 use Magento\Catalog\Model\Product;
+use Magento\Csp\Model\Collector\DynamicCollector;
+use Magento\Csp\Model\Policy\FetchPolicy;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\Registry;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
-use Magento\Backend\Block\Template;
-use Magento\Csp\Model\Collector\DynamicCollector;
-use Magento\Csp\Model\Policy\FetchPolicy;
 
 abstract class Widget extends \Magento\Backend\Block\Widget {
     protected $_template = 'widget.phtml';
+
     protected $config;
+
     private $coreRegistry;
+
     private $localeResolver;
 
     abstract protected function getWidgetPath(): string;
