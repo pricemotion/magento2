@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.14 - 2021-04-14
+
+* Fix update command breaking when price rule is disabled.
+
 ## 1.1.13 - 2020-12-16
 
 * Trigger price, attribute indexers even if indexes run on schedule.
