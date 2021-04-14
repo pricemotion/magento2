@@ -80,3 +80,6 @@ bin/magento setup:install \
 bin/magento config:set dev/template/allow_symlink 1
 
 bin/magento cache:clean
+
+bin/magento config:set admin/security/password_lifetime 0
+bin/magento config:set admin/security/password_is_forced 0
