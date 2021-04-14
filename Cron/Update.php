@@ -1,6 +1,7 @@
 <?php
 namespace Pricemotion\Magento2\Cron;
 
+use InvalidArgumentException;
 use Magento\Catalog\Api\Data\CostInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
@@ -18,6 +19,8 @@ use Pricemotion\Magento2\App\PriceRule;
 use Pricemotion\Magento2\App\Product as PricemotionProduct;
 use Pricemotion\Magento2\Logger\Logger;
 use Pricemotion\Magento2\Observer\ProductSave;
+use RuntimeException;
+use Throwable;
 
 class Update {
     private const UPDATE_INTERVAL = 3600 * 12;
@@ -102,6 +105,17 @@ class Update {
 
         try {
             $this->doExecute();
+        } catch (Throwable $e) {
+            $this->logger->critical(
+                sprintf(
+                    'Uncaught exception %s: (%d) %s',
+                    get_class($e),
+                    $e->getCode(),
+                    $e->getMessage()
+                ),
+            );
+            $this->logger->critical((string) $e);
+            throw $e;
         } finally {
             $this->emulation->stopEnvironmentEmulation();
         }
@@ -215,7 +229,7 @@ class Update {
 
         try {
             $ean = EAN::fromString($ean_string);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $this->logger->debug(sprintf(
                 "Skipping product %d with invalid EAN '%s': %s",
                 $product->getId(),
@@ -233,7 +247,7 @@ class Update {
 
         try {
             $pricemotion_product = $this->pricemotion->getProduct($ean);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             $this->logger->error(sprintf(
                 'Could not get Pricemotion data for product %d with EAN %s: %s',
                 $product->getId(),
@@ -278,7 +292,7 @@ class Update {
 
         try {
             $rule = (new PriceRule\Factory())->fromArray($settings);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $this->logger->error(sprintf(
                 'Invalid price rule for product %d: %s',
                 $product->getId(),
