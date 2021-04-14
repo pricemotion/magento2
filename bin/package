@@ -42,7 +42,7 @@ echo "$(cat composer.json | jq '. | .version = $v' --arg v "$version")" > compos
 version="$version" perl -p -i -e 's/\$VERSION\$/$ENV{version}/g' App/Constants.php
 
 mkdir -p "$(dirname "$out")"
-zip -r9 "$out.$$" * >&2
+bsdtar cf "$out.$$" --format zip *
 mv "$out.$$" "$out"
 
 echo "$out"
