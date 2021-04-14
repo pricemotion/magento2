@@ -86,7 +86,7 @@ jq '
 ' composer.json > composer.json.$$
 mv composer.json.$$ composer.json
 
-../vendor/bin/composer require pricemotion/module-pricemotion:@dev
+../vendor/bin/composer require pricemotion/module-pricemotion
 
 cd "$root"
 
