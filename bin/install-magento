@@ -3,7 +3,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-magento_version='2.3.6'
+root="$PWD"
+magento_version='2.4.2'
 
 if [[ $# -eq 1 ]]; then
 	magento_version="$1"
@@ -13,23 +14,31 @@ elif [[ $# -gt 1 ]]; then
 fi
 
 retrieve() {
-	tmp="$(mktemp)"
-	if ! wget -O "$tmp" "$2" ||
-	   ! sha256sum --strict -c <<<"$3 $tmp"
-	then
-		rm -f "$tmp"
-		return $?
+	local dest="$1"
+	local url="$2"
+	local shasum="$3"
+
+	if sha256sum --strict -c <<<"$shasum $dest" &>/dev/null; then
+		return 0
 	fi
-	mv "$tmp" "$1"
+
+	mkdir -p "$(dirname "$dest")"
+
+	tmp="$(mktemp)"
+
+	if ! wget -O "$tmp" "$url" || ! sha256sum --strict -c <<<"$shasum $tmp"; then
+		rm -f "$tmp"
+		return 1
+	fi
+
+	mv "$tmp" "$dest"
 }
 
-if [[ ! -f vendor/bin/composer ]]; then
-	mkdir -p vendor/bin
-	retrieve vendor/bin/composer \
-			 'https://getcomposer.org/download/1.10.17/composer.phar' \
-			 6fa00eba5103ce6750f94f87af8356e12cc45d5bbb11a140533790cf60725f1c
-	chmod +x vendor/bin/composer
-fi
+mkdir -p vendor/bin
+retrieve vendor/bin/composer \
+		 'https://getcomposer.org/download/2.0.12/composer.phar' \
+		 82ea8c1537cfaceb7e56f6004c7ccdf99ddafce7237c07374d920e635730a631
+chmod +x vendor/bin/composer
 
 docker-compose stop web
 
@@ -59,7 +68,27 @@ if [[ -f  ~/.config/composer/auth.json ]]; then
 		> www/var/composer_home/auth.json
 fi
 
-bin/magento sampledata:deploy
+cd "$root/www"
+
+find vendor -maxdepth 3 -mindepth 3 -name composer.json |
+	xargs cat |
+	jq -r '.suggest | select(.) | keys[]' |
+	grep -P '(^|-)sample-data($|-)' |
+	xargs ../vendor/bin/composer require
+
+jq '
+	.repositories = [
+		{
+			type: "artifact",
+			url: "../dist"
+		}
+	] + .repositories
+' composer.json > composer.json.$$
+mv composer.json.$$ composer.json
+
+../vendor/bin/composer require pricemotion/module-pricemotion:@dev
+
+cd "$root"
 
 bin/magento setup:install \
 	--base-url=http://pricemotion-magento2.test \
@@ -75,7 +104,8 @@ bin/magento setup:install \
 	--currency=EUR \
 	--timezone=Europe/Amsterdam \
 	--use-rewrites=1 \
-	--backend-frontname=admin
+	--backend-frontname=admin \
+	--elasticsearch-host=elastic
 
 bin/magento config:set dev/template/allow_symlink 1
 
@@ -83,3 +113,5 @@ bin/magento cache:clean
 
 bin/magento config:set admin/security/password_lifetime 0
 bin/magento config:set admin/security/password_is_forced 0
+
+bin/magento module:disable Magento_TwoFactorAuth

@@ -17,7 +17,7 @@ services:
       PRICEMOTION_DEVELOPMENT: 'yes'
 
   mariadb:
-    image: mariadb:10.1.45
+    image: mariadb:10.4.18
     volumes:
       - mariadb:/var/lib/mysql
     environment:
@@ -26,6 +26,14 @@ services:
     networks:
       default:
         ipv4_address: 172.21.1.3
+
+  elastic:
+    image: elasticsearch:7.12.0
+    networks:
+      default:
+        ipv4_address: 172.21.1.4
+    environment:
+      discovery.type: single-node
 
 
 volumes:
