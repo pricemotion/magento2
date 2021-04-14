@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 1.1.15 - 2021-04-14
 
 * Log uncaught exceptions and errors during cron run to `pricemotion.log`.
+* Fix Magento setup when module is installed during first Magento installation.
 
 ## 1.1.14 - 2021-04-14
 
