@@ -1,7 +1,7 @@
 <?php
 use Magento\Framework\Component\ComponentRegistrar;
 
-if (!class_exists(ComponentRegistrar::class)) {
+if (!class_exists('Magento\\Framework\\Component\\ComponentRegistrar')) {
     return;
 }
 
