@@ -4,9 +4,39 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "49188b19d98f3fb45c35b7a40cb7793a",
+    "content-hash": "206836e78a47c99d7e9d6ec885f719a7",
     "packages": [],
     "packages-dev": [
+        {
+            "name": "apeschar/php-cs-fixer",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/apeschar/php-cs-fixer.git",
+                "reference": "5ada0a36814ce3110bdfd9f50ed3c3034edb3a8a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/apeschar/php-cs-fixer/zipball/5ada0a36814ce3110bdfd9f50ed3c3034edb3a8a",
+                "reference": "5ada0a36814ce3110bdfd9f50ed3c3034edb3a8a",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kibo\\PhpCsFixer\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "support": {
+                "issues": "https://github.com/apeschar/php-cs-fixer/issues",
+                "source": "https://github.com/apeschar/php-cs-fixer/tree/1.0"
+            },
+            "time": "2021-04-13T14:33:03+00:00"
+        },
         {
             "name": "doctrine/instantiator",
             "version": "1.4.0",
