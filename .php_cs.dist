@@ -5,6 +5,7 @@ if (!class_exists(Config::class)) {
     require_once __DIR__ . '/vendor/autoload.php';
 }
 
-return Config::create(__DIR__);
+return Config::create(__DIR__)
+    ->exclude('adminer.dist.php');
 
 // vim: set ft=php :
