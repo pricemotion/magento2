@@ -3,13 +3,13 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-version=
+ref=
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
 	--version)
 		shift
-		version="$1"
+		ref="$1"
 		shift
 		;;
 	*)
@@ -19,21 +19,24 @@ while [[ $# -gt 0 ]]; do
 	esac
 done
 
-if [[ $version = "" ]]; then
-	version="$(git describe --tags --match 'v*')"
+if [[ $ref = "" ]]; then
+	ref="$(git describe --tags --match 'v*')"
 fi
 
-version="${version#v}"
+version="${ref#v}"
+if [[ $version =~ ^([^-]+)-([0-9]+)-.+$ ]]; then
+	version="${BASH_REMATCH[1]}.$(date +%s)"
+fi
 
-out="$PWD/dist/pricemotion-magento2-$version.zip"
+out="$PWD/dist/pricemotion-magento2-$ref.zip"
 
-echo "Packaging $version..." >&2
+echo "Packaging $ref as v$version..." >&2
 
 tmp="$(mktemp -d)"
 cleanup() { rm -rf "$tmp"; }
 trap cleanup EXIT
 
-git archive HEAD . | tar x -C "$tmp"
+git archive "$ref" . | tar x -C "$tmp"
 
 cd "$tmp"
 
