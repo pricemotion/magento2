@@ -10,13 +10,13 @@ class EAN {
         $ean = trim($ean);
         $ean = ltrim($ean, '0');
         if ($ean == '') {
-            throw new InvalidArgumentException("EAN is an empty string");
+            throw new InvalidArgumentException('EAN is an empty string');
         }
         if (strlen($ean) < 8 || strlen($ean) > 14) {
-            throw new InvalidArgumentException("EAN must be between 8 and 14 characters long");
+            throw new InvalidArgumentException('EAN must be between 8 and 14 characters long');
         }
         if (!$this->check($ean)) {
-            throw new InvalidArgumentException("EAN check digit is invalid");
+            throw new InvalidArgumentException('EAN check digit is invalid');
         }
         $this->value = $ean;
     }

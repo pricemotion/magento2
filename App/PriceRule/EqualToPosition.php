@@ -9,7 +9,7 @@ class EqualToPosition implements PriceRuleInterface {
     public function __construct($value) {
         $this->value = (int) $value;
         if ($this->value < 1) {
-            throw new \InvalidArgumentException("Equal to position value must be at least 1");
+            throw new \InvalidArgumentException('Equal to position value must be at least 1');
         }
     }
 

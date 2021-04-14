@@ -14,7 +14,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Update extends Command {
     private $job;
+
     private $state;
+
     private $logger;
 
     public function __construct(
@@ -46,9 +48,9 @@ class Update extends Command {
         if ($input->getOption('ean')) {
             $this->job->setEanFilter($input->getOption('ean'));
         }
-        $this->logger->info(sprintf("Starting manual update run: %s", $input));
+        $this->logger->info(sprintf('Starting manual update run: %s', $input));
         $this->job->execute();
-        $this->logger->info("Completed manual update run");
+        $this->logger->info('Completed manual update run');
         return 0;
     }
 }

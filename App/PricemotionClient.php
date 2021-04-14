@@ -17,7 +17,7 @@ class PricemotionClient {
         $document = new \DOMDocument();
 
         if (!$document->loadXML($result)) {
-            throw new \RuntimeException("API response is not valid XML");
+            throw new \RuntimeException('API response is not valid XML');
         }
 
         return Product::fromXmlResponse($document);
@@ -31,7 +31,7 @@ class PricemotionClient {
     private function post(string $path, array $data): array {
         $json = json_encode($data);
         if ($json === false) {
-            throw new \RuntimeException("JSON encode failed");
+            throw new \RuntimeException('JSON encode failed');
         }
         $result = $this->request($path, [
             CURLOPT_POSTFIELDS => $json,
@@ -45,7 +45,7 @@ class PricemotionClient {
     private function request(string $path, array $options = []): string {
         $ch = curl_init();
         if (!$ch) {
-            throw new \RuntimeException("curl_init failed");
+            throw new \RuntimeException('curl_init failed');
         }
         $options += [
             CURLOPT_URL => $this->getUrl($path),
@@ -55,15 +55,17 @@ class PricemotionClient {
         ];
         if (!curl_setopt_array($ch, $options)) {
             throw new \RuntimeException(sprintf(
-                "curl_setopt_array failed: (%s) %s",
-                curl_errno($ch), curl_error($ch)
+                'curl_setopt_array failed: (%s) %s',
+                curl_errno($ch),
+                curl_error($ch)
             ));
         }
         $result = curl_exec($ch);
         if ($result === false) {
             throw new \RuntimeException(sprintf(
-                "API request failed: (%s) %s",
-                curl_errno($ch), curl_error($ch)
+                'API request failed: (%s) %s',
+                curl_errno($ch),
+                curl_error($ch)
             ));
         }
         return $result;
@@ -78,6 +80,6 @@ class PricemotionClient {
     }
 
     private function getUrl(string $path): string {
-        return "https://www.pricemotion.nl" . $path;
+        return 'https://www.pricemotion.nl' . $path;
     }
 }

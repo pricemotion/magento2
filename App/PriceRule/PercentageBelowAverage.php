@@ -9,7 +9,7 @@ class PercentageBelowAverage implements PriceRuleInterface {
     public function __construct($value) {
         $this->value = ((float) $value) / 100;
         if ($this->value < 0 || $this->value > 1) {
-            throw new \InvalidArgumentException("Percentage below average value must be between 0% and 100%");
+            throw new \InvalidArgumentException('Percentage below average value must be between 0% and 100%');
         }
     }
 

@@ -11,7 +11,7 @@ class Factory {
 
     public function fromArray(array $data): PriceRuleInterface {
         if (empty($data['rule'])) {
-            throw new \InvalidArgumentException("Price rule JSON misses rule element");
+            throw new \InvalidArgumentException('Price rule JSON misses rule element');
         }
         if (!isset(self::RULE_CLASSES[$data['rule']])) {
             throw new \InvalidArgumentException("Invalid price rule: {$data['rule']}");

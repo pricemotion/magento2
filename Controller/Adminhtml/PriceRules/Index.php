@@ -2,26 +2,30 @@
 namespace Pricemotion\Magento2\Controller\Adminhtml\PriceRules;
 
 use Magento\Backend\App\Action;
+use Magento\Catalog\Model\ResourceModel\Product\Action as ProductAction;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Store\Model\Store;
 use Magento\Ui\Component\MassAction\Filter;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\Helper\PriceRules as Helper;
-use Magento\Catalog\Model\ResourceModel\Product\Action as ProductAction;
 use Pricemotion\Magento2\Logger\Logger;
 
 class Index extends Action implements HttpPostActionInterface, HttpGetActionInterface {
-
     const ADMIN_RESOURCE = 'Magento_Catalog::update_attributes';
 
     private $resultPageFactory;
+
     private $filter;
+
     private $collectionFactory;
+
     private $helper;
+
     private $productAction;
+
     private $logger;
 
     public function __construct(
@@ -49,14 +53,14 @@ class Index extends Action implements HttpPostActionInterface, HttpGetActionInte
         }
 
         if (!$this->helper->getProductIds()) {
-            $this->messageManager->addErrorMessage(__("Please select products of which to change the Pricemotion price rules."));
+            $this->messageManager->addErrorMessage(__('Please select products of which to change the Pricemotion price rules.'));
             return $this->resultRedirectFactory->create()->setPath('catalog/product/', ['_current' => true]);
         }
 
         if ($this->_request->getParam('product_pricemotion_settings')) {
             $product_ids = $this->helper->getProductIds();
             $this->logger->info(sprintf(
-                "Updating %s attribute on %d products",
+                'Updating %s attribute on %d products',
                 Constants::ATTR_SETTINGS,
                 sizeof($product_ids)
             ));
@@ -70,16 +74,15 @@ class Index extends Action implements HttpPostActionInterface, HttpGetActionInte
                 $this->_request->getParam('store', Store::DEFAULT_STORE_ID)
             );
             $duration = microtime(true) - $start_time;
-            $this->logger->debug(sprintf("Mass update completed in %.4f s", $duration));
+            $this->logger->debug(sprintf('Mass update completed in %.4f s', $duration));
             $this->helper->setProductIds([]);
-            $this->messageManager->addSuccessMessage(__("Pricemotion price rules have been updated for %1 products.", sizeof($product_ids)));
+            $this->messageManager->addSuccessMessage(__('Pricemotion price rules have been updated for %1 products.', sizeof($product_ids)));
             return $this->resultRedirectFactory->create()->setPath('catalog/product/', ['_current' => true]);
         }
 
         $page = $this->resultPageFactory->create();
-        $page->getConfig()->getTitle()->prepend(__("Update Pricemotion price rules"));
+        $page->getConfig()->getTitle()->prepend(__('Update Pricemotion price rules'));
 
         return $page;
     }
-
 }

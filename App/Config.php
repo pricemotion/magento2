@@ -43,10 +43,9 @@ class Config {
     private function base64encode(string $data): string {
         $result = base64_encode($data);
         $result = rtrim($result, '=');
-        $result = strtr($result, [
+        return strtr($result, [
             '+' => '-',
             '/' => '_',
         ]);
-        return $result;
     }
 }

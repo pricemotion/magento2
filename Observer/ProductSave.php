@@ -2,19 +2,20 @@
 namespace Pricemotion\Magento2\Observer;
 
 use Magento\Catalog\Api\Data\CostInterface;
-use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\Product;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Catalog\Model\Product;
+use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\Logger\Logger;
-use Pricemotion\Magento2\App\Config;
 
 class ProductSave implements ObserverInterface {
-
     private $logger;
+
     private $eanAttribute;
+
     private $priceAttribute;
+
     private $listPriceAttribute;
 
     public function __construct(
@@ -49,7 +50,7 @@ class ProductSave implements ObserverInterface {
             && !$this->changed($product, Constants::ATTR_UPDATED_AT)
         ) {
             $this->logger->debug(sprintf(
-                "Attributes %s changed on product %d; resetting update timestamp...",
+                'Attributes %s changed on product %d; resetting update timestamp...',
                 implode(', ', $changed_attributes),
                 $product->getId()
             ));
@@ -58,7 +59,7 @@ class ProductSave implements ObserverInterface {
 
         if ($this->changed($product, $this->eanAttribute)) {
             $this->logger->debug(sprintf(
-                "EAN changed on product %d; resetting update timestamp and lowest price...",
+                'EAN changed on product %d; resetting update timestamp and lowest price...',
                 $product->getId()
             ));
             $product->setData(Constants::ATTR_UPDATED_AT, null);
@@ -115,5 +116,4 @@ class ProductSave implements ObserverInterface {
         }
         return json_decode($value, true);
     }
-
 }
