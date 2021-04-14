@@ -1,4 +1,5 @@
 /dist
+/.php_cs.cache
 /pkg
 /vendor
 /www
