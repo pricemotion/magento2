@@ -1,11 +1,12 @@
 <?php
-use Kibo\PhpCsFixer\Config;
+use Kibo\PhpCsFixer\Factory;
 
-if (!class_exists(Config::class)) {
-    require_once __DIR__ . '/vendor/autoload.php';
+if (!class_exists(Factory::class)) {
+    require_once 'vendor/autoload.php';
 }
 
-return Config::create(__DIR__)
-    ->exclude('adminer.dist.php');
+return (new Factory(__DIR__))
+    ->exclude('adminer.dist.php')
+    ->config();
 
 // vim: set ft=php :

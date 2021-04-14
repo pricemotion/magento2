@@ -19,6 +19,6 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9",
-        "apeschar/php-cs-fixer": "^1.0"
+        "apeschar/php-cs-fixer": "^2"
     }
 }

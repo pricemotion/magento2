@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "206836e78a47c99d7e9d6ec885f719a7",
+    "content-hash": "c4c88bb1b879b6b53521259c2bcd5ec9",
     "packages": [],
     "packages-dev": [
         {
             "name": "apeschar/php-cs-fixer",
-            "version": "1.0",
+            "version": "2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/apeschar/php-cs-fixer.git",
-                "reference": "5ada0a36814ce3110bdfd9f50ed3c3034edb3a8a"
+                "reference": "63ab1fb1bba502b5a4766eb2d0a6d61bd25f75dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/apeschar/php-cs-fixer/zipball/5ada0a36814ce3110bdfd9f50ed3c3034edb3a8a",
-                "reference": "5ada0a36814ce3110bdfd9f50ed3c3034edb3a8a",
+                "url": "https://api.github.com/repos/apeschar/php-cs-fixer/zipball/63ab1fb1bba502b5a4766eb2d0a6d61bd25f75dc",
+                "reference": "63ab1fb1bba502b5a4766eb2d0a6d61bd25f75dc",
                 "shasum": ""
             },
             "type": "library",
@@ -33,9 +33,9 @@
             ],
             "support": {
                 "issues": "https://github.com/apeschar/php-cs-fixer/issues",
-                "source": "https://github.com/apeschar/php-cs-fixer/tree/1.0"
+                "source": "https://github.com/apeschar/php-cs-fixer/tree/2.0"
             },
-            "time": "2021-04-13T14:33:03+00:00"
+            "time": "2021-04-14T05:18:34+00:00"
         },
         {
             "name": "doctrine/instantiator",
