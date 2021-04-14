@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Log uncaught exceptions and errors during cron run to `pricemotion.log`.
+
 ## 1.1.14 - 2021-04-14
 
 * Fix update command breaking when price rule is disabled.
