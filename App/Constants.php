@@ -12,10 +12,16 @@ class Constants {
 
     const ATTR_SETTINGS = 'pricemotion_settings';
 
+    const PUBKEY_SIGN = 'jgv3KkVIW4VzKbq8g6fs/XvhZk56BqJeU2/ch2tqm7k=';
+
     public static function getAssetVersion() {
         if (self::isDevelopmentVersion()) {
             return $_SERVER['REQUEST_TIME'];
         }
+        return self::getVersion();
+    }
+
+    public static function getVersion() {
         if (self::$version != '$VER' . 'SION$') {
             return self::$version;
         }
