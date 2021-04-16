@@ -25,8 +25,4 @@ return [
         'PregRegexCheckerPlugin',
         'PrintfCheckerPlugin',
     ],
-    'suppress_issue_types' => [
-        'PhanAccessMethodInternal',
-        'PhanPluginMixedKeyNoKey',
-    ],
 ];
