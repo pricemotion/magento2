@@ -38,6 +38,7 @@ class Update {
 
     private $pricemotion;
 
+    /** @var string */
     private $eanAttribute;
 
     private $priceAttribute;
@@ -62,32 +63,32 @@ class Update {
 
     public function __construct(
         Logger $logger,
-        CollectionFactory $product_collection_factory,
+        CollectionFactory $productCollectionFactory,
         Config $config,
-        PricemotionClient $pricemotion_client,
-        Action $product_action,
-        ProductSave $product_save_observer,
-        StoreManagerInterface $store_manager,
+        PricemotionClient $pricemotionClient,
+        Action $productAction,
+        ProductSave $productSaveObserver,
+        StoreManagerInterface $storeManager,
         Emulation $emulation,
-        IndexerRegistry $indexer_registry
+        IndexerRegistry $indexerRegistry
     ) {
         $this->logger = $logger;
-        $this->productCollectionFactory = $product_collection_factory;
+        $this->productCollectionFactory = $productCollectionFactory;
         $this->config = $config;
-        $this->pricemotion = $pricemotion_client;
-        $this->productAction = $product_action;
-        $this->productSaveObserver = $product_save_observer;
-        $this->storeManager = $store_manager;
+        $this->pricemotion = $pricemotionClient;
+        $this->productAction = $productAction;
+        $this->productSaveObserver = $productSaveObserver;
+        $this->storeManager = $storeManager;
         $this->emulation = $emulation;
-        $this->indexerRegistry = $indexer_registry;
+        $this->indexerRegistry = $indexerRegistry;
     }
 
     public function setIgnoreUpdatedAt(bool $value): void {
         $this->ignoreUpdatedAt = $value;
     }
 
-    public function setTimeLimit(?int $time_limit): void {
-        $this->timeLimit = $time_limit;
+    public function setTimeLimit(?int $timeLimit): void {
+        $this->timeLimit = $timeLimit;
     }
 
     public function setEanFilter(?array $eanFilter): void {
@@ -128,12 +129,13 @@ class Update {
             $run_until = time() + $this->timeLimit;
         }
 
-        $this->eanAttribute = $this->config->getEanAttribute();
-        if (!$this->eanAttribute) {
+        $eanAttribute = $this->config->getEanAttribute();
+        if (!$eanAttribute) {
             $this->logger->warning('No EAN product attribute is configured; not updating products');
             return;
         }
 
+        $this->eanAttribute = $eanAttribute;
         $this->priceAttribute = $this->config->getPriceAttribute();
         $this->listPriceAttribute = $this->config->getListPriceAttribute();
 
@@ -173,7 +175,6 @@ class Update {
 
         $product_collection->addPriceData();
 
-        /** @var Product[] $products */
         $products = $product_collection->getItems();
 
         if (!$products) {
@@ -187,10 +188,12 @@ class Update {
 
         $processed = 0;
         foreach ($products as $product) {
+            assert($product instanceof Product);
+
             $this->logger->debug(sprintf(
                 'Product %d: %s',
                 $product->getId(),
-                json_encode($product->getData(), JSON_UNESCAPED_UNICODE, JSON_PARTIAL_OUTPUT_ON_ERROR)
+                json_encode($product->getData(), JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR)
             ));
 
             $this->updateProduct($product);
@@ -217,9 +220,13 @@ class Update {
             ));
             $this->productAction->updateAttributes([$product->getId()], $update, $product->getStoreId());
             foreach (self::INDEXER_IDS as $indexer_id) {
-                /** @var AbstractProcessor $indexer */
                 $indexer = $this->indexerRegistry->get($indexer_id);
-                $indexer->reindexRow($product->getId(), true);
+                if ($indexer instanceof AbstractProcessor) {
+                    $indexer->reindexRow($product->getId(), true);
+                } else {
+                    /** @phan-suppress-next-line PhanDeprecatedFunction */
+                    $indexer->reindexRow($product->getId());
+                }
             }
         }
     }
@@ -262,7 +269,9 @@ class Update {
             Constants::ATTR_UPDATED_AT => microtime(true),
         ];
 
-        if (($new_price = $this->getNewPrice($product, $pricemotion_product)) !== null) {
+        if (($new_price = $this->getNewPrice($product, $pricemotion_product)) !== null
+            && $this->priceAttribute
+        ) {
             $update[$this->priceAttribute] = $new_price;
         }
 

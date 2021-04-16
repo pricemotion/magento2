@@ -29,19 +29,19 @@ class Index extends Action implements HttpPostActionInterface, HttpGetActionInte
     private $logger;
 
     public function __construct(
-        PageFactory $page_factory,
+        PageFactory $pageFactory,
         Filter $filter,
-        CollectionFactory $collection_factory,
+        CollectionFactory $collectionFactory,
         Helper $helper,
-        ProductAction $product_action,
+        ProductAction $productAction,
         Logger $logger,
         Action\Context $context
     ) {
-        $this->resultPageFactory = $page_factory;
+        $this->resultPageFactory = $pageFactory;
         $this->filter = $filter;
-        $this->collectionFactory = $collection_factory;
+        $this->collectionFactory = $collectionFactory;
         $this->helper = $helper;
-        $this->productAction = $product_action;
+        $this->productAction = $productAction;
         $this->logger = $logger;
         parent::__construct($context);
     }

@@ -13,14 +13,15 @@ class LowestPriceRatio extends Column {
 
         foreach ($dataSource['data']['items'] as &$item) {
             if (isset($item[$field])) {
-                $item[$field] = $this->formatValue((string) $item[$field]);
+                $item[$field] = $this->formatValue((float) $item[$field]);
             }
         }
 
         return $dataSource;
     }
 
-    private function formatValue(string $value): string {
+    private function formatValue(float $value): string {
+        /** @phan-suppress-next-line PhanPluginPrintfNotPercent */
         return sprintf('%+.1f%%', ($value - 1) * 100);
     }
 }

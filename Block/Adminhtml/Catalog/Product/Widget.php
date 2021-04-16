@@ -65,6 +65,7 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
     }
 
     protected function getProduct(): Product {
+        /** @phan-suppress-next-line PhanDeprecatedFunction */
         return $this->coreRegistry->registry('current_product');
     }
 

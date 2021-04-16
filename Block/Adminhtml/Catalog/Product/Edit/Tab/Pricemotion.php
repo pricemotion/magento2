@@ -10,9 +10,11 @@ class Pricemotion extends Widget {
     }
 
     protected function getWidgetParameters(): \stdClass {
+        $eanAttribute = $this->config->getEanAttribute();
+
         return (object) [
             'token' => $this->config->getApiToken(),
-            'ean' => $this->getProduct()->getData($this->config->getEanAttribute()),
+            'ean' => $eanAttribute ? $this->getProduct()->getData($eanAttribute) : null,
             'settings' => $this->getProduct()->getData(Constants::ATTR_SETTINGS) ?: new \stdClass(),
         ];
     }

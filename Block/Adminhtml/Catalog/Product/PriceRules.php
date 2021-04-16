@@ -61,6 +61,6 @@ class PriceRules extends Widget {
             ]
         );
 
-        parent::_prepareLayout();
+        return parent::_prepareLayout();
     }
 }

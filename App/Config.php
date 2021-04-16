@@ -23,15 +23,17 @@ class Config {
     }
 
     public function getApiToken(): ?string {
-        if (!$this->getApiKey()) {
+        $apiKey = $this->getApiKey();
+
+        if ($apiKey === null) {
             return null;
         }
 
         $expiresAt = time() + 3600;
 
         return $this->base64encode(implode('', [
-            hash('sha256', $this->getApiKey(), true),
-            hash_hmac('sha256', $expiresAt, $this->getApiKey(), true),
+            hash('sha256', $apiKey, true),
+            hash_hmac('sha256', (string) $expiresAt, $apiKey, true),
             pack('P', $expiresAt),
         ]));
     }

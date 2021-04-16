@@ -8,14 +8,14 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 class PriceRules {
     private $session;
 
-    private $product_collection_factory;
+    private $productCollectionFactory;
 
     public function __construct(
         Session $session,
-        CollectionFactory $product_collection_factory
+        CollectionFactory $productCollectionFactory
     ) {
         $this->session = $session;
-        $this->product_collection_factory = $product_collection_factory;
+        $this->productCollectionFactory = $productCollectionFactory;
     }
 
     /** @param int[] $productIds */
@@ -39,7 +39,7 @@ class PriceRules {
             $productsIds = [0];
         }
 
-        return $this->product_collection_factory
+        return $this->productCollectionFactory
             ->create()
             ->addIdFilter($productsIds);
     }

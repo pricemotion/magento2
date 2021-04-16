@@ -20,8 +20,10 @@ class ProductAttributes implements OptionSourceInterface {
             ],
         ];
 
-        /** @var Attribute $attribute */
         foreach ($this->attributeCollection as $attribute) {
+            if (!$attribute instanceof Attribute) {
+                continue;
+            }
             $result[] = [
                 'value' => $attribute->getName(),
                 'label' => $attribute->getStoreLabel(),

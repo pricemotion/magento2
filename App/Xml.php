@@ -15,6 +15,7 @@ class Xml {
         if ($elements->length !== 1) {
             throw new \RuntimeException("Expected exactly one result from query '{$query}'");
         }
+        /** @phan-suppress-next-line PhanTypeMismatchReturnNullable */
         return $elements->item(0);
     }
 
