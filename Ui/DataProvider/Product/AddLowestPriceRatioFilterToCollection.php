@@ -6,8 +6,11 @@ use Magento\Ui\DataProvider\AddFilterToCollectionInterface;
 
 class AddLowestPriceRatioFilterToCollection implements AddFilterToCollectionInterface {
     public function addFilter(Collection $collection, $field, $condition = null) {
+        if (!is_array($condition)) {
+            return;
+        }
         $collection->addFieldToFilter($field, array_map(function ($value) {
-            return 1 + $value / 100;
+            return 1 + (float) $value / 100;
         }, $condition));
     }
 }
