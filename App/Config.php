@@ -10,16 +10,24 @@ class Config {
         $this->config = $config;
     }
 
+    public function requireEanAttribute(): string {
+        $attribute = $this->getEanAttribute();
+        if ($attribute === null) {
+            throw new ConfigurationException('EAN attribute must be configured');
+        }
+        return $attribute;
+    }
+
     public function getEanAttribute(): ?string {
-        return $this->config->getValue('pricemotion/attributes/ean');
+        return $this->config->getValue('pricemotion/attributes/ean') ?: null;
     }
 
     public function getPriceAttribute(): ?string {
-        return $this->config->getValue('pricemotion/attributes/price');
+        return $this->config->getValue('pricemotion/attributes/price') ?: null;
     }
 
     public function getListPriceAttribute(): ?string {
-        return $this->config->getValue('pricemotion/attributes/list_price');
+        return $this->config->getValue('pricemotion/attributes/list_price') ?: null;
     }
 
     public function getApiToken(): ?string {

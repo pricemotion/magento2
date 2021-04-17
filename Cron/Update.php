@@ -5,19 +5,20 @@ use InvalidArgumentException;
 use Magento\Catalog\Api\Data\CostInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
-use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\Area;
 use Magento\Framework\Indexer\AbstractProcessor;
 use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
 use Pricemotion\Magento2\App\Config;
+use Pricemotion\Magento2\App\ConfigurationException;
 use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\App\EAN;
 use Pricemotion\Magento2\App\PricemotionClient;
 use Pricemotion\Magento2\App\PriceRule;
 use Pricemotion\Magento2\App\Product as PricemotionProduct;
 use Pricemotion\Magento2\Logger\Logger;
+use Pricemotion\Magento2\Model\ProductRepository;
 use Pricemotion\Magento2\Observer\ProductSave;
 use RuntimeException;
 use Throwable;
@@ -32,14 +33,9 @@ class Update {
 
     private $logger;
 
-    private $productCollectionFactory;
-
     private $config;
 
     private $pricemotion;
-
-    /** @var string */
-    private $eanAttribute;
 
     private $priceAttribute;
 
@@ -61,19 +57,20 @@ class Update {
 
     private $indexerRegistry;
 
+    private $productRepository;
+
     public function __construct(
         Logger $logger,
-        CollectionFactory $productCollectionFactory,
         Config $config,
         PricemotionClient $pricemotionClient,
         Action $productAction,
         ProductSave $productSaveObserver,
         StoreManagerInterface $storeManager,
         Emulation $emulation,
-        IndexerRegistry $indexerRegistry
+        IndexerRegistry $indexerRegistry,
+        ProductRepository $productRepository
     ) {
         $this->logger = $logger;
-        $this->productCollectionFactory = $productCollectionFactory;
         $this->config = $config;
         $this->pricemotion = $pricemotionClient;
         $this->productAction = $productAction;
@@ -81,6 +78,7 @@ class Update {
         $this->storeManager = $storeManager;
         $this->emulation = $emulation;
         $this->indexerRegistry = $indexerRegistry;
+        $this->productRepository = $productRepository;
     }
 
     public function setIgnoreUpdatedAt(bool $value): void {
@@ -113,7 +111,7 @@ class Update {
                     get_class($e),
                     $e->getCode(),
                     $e->getMessage()
-                ),
+                )
             );
             $this->logger->critical((string) $e);
             throw $e;
@@ -129,53 +127,28 @@ class Update {
             $run_until = time() + $this->timeLimit;
         }
 
-        $eanAttribute = $this->config->getEanAttribute();
-        if (!$eanAttribute) {
-            $this->logger->warning('No EAN product attribute is configured; not updating products');
+        try {
+            $this->priceAttribute = $this->config->getPriceAttribute();
+            $this->listPriceAttribute = $this->config->getListPriceAttribute();
+
+            $this->logger->debug("EAN attribute: {$this->config->requireEanAttribute()}");
+            $this->logger->debug("Price attribute: {$this->priceAttribute}");
+            $this->logger->debug("List price attribute: {$this->listPriceAttribute}");
+
+            if ($this->eanFilter !== null) {
+                $products = $this->productRepository->getByEans($this->eanFilter);
+                if ($this->ignoreUpdatedAt) {
+                    $this->logger->warning("The `force' option is superfluous when selecting EANs to be updated");
+                }
+            } elseif ($this->ignoreUpdatedAt) {
+                $products = $this->productRepository->getAll();
+            } else {
+                $products = $this->productRepository->getForUpdate(self::UPDATE_INTERVAL);
+            }
+        } catch (ConfigurationException $e) {
+            $this->logger->warning($e->getMessage());
             return;
         }
-
-        $this->eanAttribute = $eanAttribute;
-        $this->priceAttribute = $this->config->getPriceAttribute();
-        $this->listPriceAttribute = $this->config->getListPriceAttribute();
-
-        $this->logger->debug("EAN attribute: {$this->eanAttribute}");
-        $this->logger->debug("Price attribute: {$this->priceAttribute}");
-        $this->logger->debug("List price attribute: {$this->listPriceAttribute}");
-
-        $product_collection = $this->productCollectionFactory->create();
-
-        $product_collection->addAttributeToFilter($this->eanAttribute, ['neq' => '']);
-
-        if ($this->eanFilter !== null) {
-            $product_collection->addAttributeToFilter($this->eanAttribute, array_map(function ($ean) {
-                return ['eq' => $ean];
-            }, $this->eanFilter));
-            if ($this->ignoreUpdatedAt) {
-                $this->logger->warning("The `force' option is superfluous when selecting EANs to be updated");
-            }
-        } elseif (!$this->ignoreUpdatedAt) {
-            $product_collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT, 'left');
-            $product_collection->addAttributeToFilter(Constants::ATTR_UPDATED_AT, [
-                ['null' => true],
-                ['lt' => microtime(true) - self::UPDATE_INTERVAL],
-            ]);
-        }
-
-        $product_collection->addAttributeToSelect($this->eanAttribute);
-        if ($this->priceAttribute) {
-            $product_collection->addAttributeToSelect($this->priceAttribute);
-        }
-        if ($this->listPriceAttribute) {
-            $product_collection->addAttributeToSelect($this->listPriceAttribute);
-        }
-        $product_collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT);
-        $product_collection->addAttributeToSelect(Constants::ATTR_SETTINGS);
-        $product_collection->addAttributeToSelect(CostInterface::COST);
-
-        $product_collection->addPriceData();
-
-        $products = $product_collection->getItems();
 
         if (!$products) {
             $this->logger->info('There are no products that need updating');
@@ -232,7 +205,7 @@ class Update {
     }
 
     private function getUpdateData(Product $product): array {
-        $ean_string = $product->getData($this->eanAttribute);
+        $ean_string = $product->getData($this->config->requireEanAttribute());
 
         try {
             $ean = EAN::fromString($ean_string);
