@@ -28,20 +28,6 @@ class PricemotionClient {
         return $this->request($path);
     }
 
-    private function post(string $path, array $data): array {
-        $json = json_encode($data);
-        if ($json === false) {
-            throw new \RuntimeException('JSON encode failed');
-        }
-        $result = $this->request($path, [
-            CURLOPT_POSTFIELDS => $json,
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
-        return $this->decodeResponse($result);
-    }
-
     private function request(string $path, array $options = []): string {
         $ch = curl_init();
         if (!$ch) {
@@ -67,14 +53,6 @@ class PricemotionClient {
                 curl_errno($ch),
                 curl_error($ch)
             ));
-        }
-        return $result;
-    }
-
-    private function decodeResponse(string $response): array {
-        $result = json_decode($response, true);
-        if (!is_array($result)) {
-            throw new \RuntimeException("API response is not a JSON object: {$response}");
         }
         return $result;
     }

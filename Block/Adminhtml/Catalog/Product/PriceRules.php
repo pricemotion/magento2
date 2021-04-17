@@ -6,20 +6,16 @@ use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\AbstractBlock;
 use Pricemotion\Magento2\App\Config;
-use Pricemotion\Magento2\Helper\PriceRules as Helper;
 
+/** @phan-suppress-next-line PhanUnreferencedClass */
 class PriceRules extends Widget {
-    private $helper;
-
     public function __construct(
-        Helper $helper,
         Template\Context $context,
         Registry $coreRegistry,
         Config $config,
         ResolverInterface $locale_resolver,
         array $data = []
     ) {
-        $this->helper = $helper;
         parent::__construct($context, $coreRegistry, $config, $locale_resolver, $data);
     }
 

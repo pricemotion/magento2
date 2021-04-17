@@ -15,7 +15,7 @@ class LessThanPosition implements PriceRuleInterface {
 
     public function calculate(Product $product): ?float {
         $position = 0;
-        foreach ($product->getOffers() as $i => $offer) {
+        foreach ($product->getOffers() as $offer) {
             if (++$position >= $this->value) {
                 return $offer->getPrice() - 0.01;
             }

@@ -9,6 +9,7 @@ use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Pricemotion\Magento2\App\Constants;
 
+/** @phan-suppress-next-line PhanUnreferencedClass */
 class InstallData implements InstallDataInterface {
     private $eavSetup;
 

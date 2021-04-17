@@ -5,6 +5,7 @@ use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection as ProductAttributeCollection;
 use Magento\Framework\Data\OptionSourceInterface;
 
+/** @phan-suppress-next-line PhanUnreferencedClass */
 class ProductAttributes implements OptionSourceInterface {
     private $attributeCollection;
 

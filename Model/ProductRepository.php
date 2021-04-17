@@ -22,7 +22,7 @@ class ProductRepository {
     }
 
     public function getAll(): array {
-        return $this->getFiltered(function (Collection $collection): void {
+        return $this->getFiltered(function (): void {
         });
     }
 

@@ -4,6 +4,7 @@ namespace Pricemotion\Magento2\Ui\DataProvider\Product;
 use Magento\Framework\Data\Collection;
 use Magento\Ui\DataProvider\AddFilterToCollectionInterface;
 
+/** @phan-suppress-next-line PhanUnreferencedClass */
 class AddLowestPriceRatioFilterToCollection implements AddFilterToCollectionInterface {
     public function addFilter(Collection $collection, $field, $condition = null) {
         if (!is_array($condition)) {

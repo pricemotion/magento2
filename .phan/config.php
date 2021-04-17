@@ -1,21 +1,22 @@
 <?php
+
 $vendorDirectories = [
+    '.phan/stubs',
+    'www/generated/code/Magento/Catalog/Model/ResourceModel/Product',
     'www/vendor/magento/framework',
-    'www/vendor/magento/module-catalog',
     'www/vendor/magento/module-backend',
+    'www/vendor/magento/module-catalog',
     'www/vendor/magento/module-csp',
+    'www/vendor/magento/module-eav',
     'www/vendor/magento/module-store',
     'www/vendor/magento/module-ui',
-    'www/vendor/magento/module-eav',
-    'www/vendor/symfony/console',
     'www/vendor/monolog/monolog',
-    'www/generated/code/Magento/Catalog/Model/ResourceModel/Product',
+    'www/vendor/symfony/console',
 ];
 
 return [
     'target_php_version' => '7.3',
     'directory_list' => iterator_to_array((function () use ($vendorDirectories) {
-        yield '.phan/stubs';
         foreach (scandir(__DIR__ . '/..') as $file) {
             if (is_dir(__DIR__ . '/../' . $file)
                 && preg_match('~^[A-Z]~', $file)
@@ -38,5 +39,13 @@ return [
         'DuplicateArrayKeyPlugin',
         'PregRegexCheckerPlugin',
         'PrintfCheckerPlugin',
+    ],
+    'dead_code_detection' => true,
+    'unused_variable_detection' => true,
+    'redundant_condition_detection' => true,
+    'suppress_issue_types' => [
+        'PhanUnusedProtectedMethodParameter',
+        'PhanUnusedPublicMethodParameter',
+        'PhanUnusedVariableCaughtException',
     ],
 ];
