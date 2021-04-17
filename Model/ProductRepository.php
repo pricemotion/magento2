@@ -53,12 +53,12 @@ class ProductRepository {
     private function getFiltered(\Closure $filter): array {
         $collection = $this->collectionFactory->create();
 
-        $collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT);
+        $collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT, 'left');
         $collection->addAttributeToSelect($this->config->requireEanAttribute());
         $this->addOptionalAttributeToSelect($collection, $this->config->getPriceAttribute());
         $this->addOptionalAttributeToSelect($collection, $this->config->getListPriceAttribute());
-        $collection->addAttributeToSelect(Constants::ATTR_SETTINGS);
-        $collection->addAttributeToSelect(CostInterface::COST);
+        $collection->addAttributeToSelect(Constants::ATTR_SETTINGS, 'left');
+        $collection->addAttributeToSelect(CostInterface::COST, 'left');
 
         $collection->addAttributeToFilter($this->config->requireEanAttribute(), ['neq' => '']);
 
@@ -74,7 +74,7 @@ class ProductRepository {
         ?string $attribute
     ): void {
         if ($attribute !== null) {
-            $collection->addAttributeToSelect($attribute);
+            $collection->addAttributeToSelect($attribute, 'left');
         }
     }
 }
