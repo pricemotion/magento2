@@ -161,8 +161,6 @@ class Update {
 
         $processed = 0;
         foreach ($products as $product) {
-            assert($product instanceof Product);
-
             $this->logger->debug(sprintf(
                 'Product %d: %s',
                 $product->getId(),

@@ -2,8 +2,9 @@
 namespace Pricemotion\Magento2\App;
 
 use InvalidArgumentException;
+use JsonSerializable;
 
-class EAN {
+class EAN implements JsonSerializable {
     private $value;
 
     private function __construct(string $ean) {
@@ -43,5 +44,9 @@ class EAN {
 
     public function toString(): string {
         return $this->value;
+    }
+
+    public function jsonSerialize(): string {
+        return $this->toString();
     }
 }

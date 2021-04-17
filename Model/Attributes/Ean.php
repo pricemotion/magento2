@@ -1,7 +1,9 @@
 <?php
 namespace Pricemotion\Magento2\Model\Attributes;
 
+use InvalidArgumentException;
 use Pricemotion\Magento2\App\Config;
+use Pricemotion\Magento2\App\EAN as EanValue;
 use Pricemotion\Magento2\Model\ConfigurableAttribute;
 
 class Ean extends ConfigurableAttribute {
@@ -9,7 +11,11 @@ class Ean extends ConfigurableAttribute {
         return $config->getEanAttribute();
     }
 
-    public function decode(string $value): ?string {
-        return $value;
+    public function decode(string $value): ?EanValue {
+        try {
+            return EanValue::fromString($value);
+        } catch (InvalidArgumentException $e) {
+            return null;
+        }
     }
 }
