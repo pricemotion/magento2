@@ -5,6 +5,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\CsrfAwareActionInterface;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Pricemotion\Magento2\App\Constants;
@@ -85,13 +86,13 @@ class Index extends Action implements
             throw new Push\BadRequestException('Unknown action');
         }
 
-        $action = new $cls();
-
-        if (!$action instanceof Push\Action) {
-            throw new Push\BadRequestException('Invalid action');
-        }
-
         try {
+            $action = ObjectManager::getInstance()->get($cls);
+
+            if (!$action instanceof Push\Action) {
+                throw new Push\BadRequestException('Invalid action');
+            }
+
             return $action->execute($input);
         } catch (Throwable $e) {
             throw new Push\InternalException(
