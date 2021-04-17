@@ -7,18 +7,23 @@ use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Constants;
+use Pricemotion\Magento2\Logger\Logger;
 
 class ProductRepository {
     private $collectionFactory;
 
     private $config;
 
+    private $logger;
+
     public function __construct(
         CollectionFactory $collectionFactory,
-        Config $config
+        Config $config,
+        Logger $logger
     ) {
         $this->collectionFactory = $collectionFactory;
         $this->config = $config;
+        $this->logger = $logger;
     }
 
     public function getAll(): array {
@@ -66,7 +71,18 @@ class ProductRepository {
 
         $filter($collection);
 
-        return $collection->getItems();
+        $startTime = microtime(true);
+
+        $collection->load(false, true);
+        $result = $collection->getItems();
+
+        $this->logger->info(sprintf(
+            'Retrieved %d products in %.2f s',
+            sizeof($result),
+            microtime(true) - $startTime
+        ));
+
+        return $result;
     }
 
     private function addOptionalAttributeToSelect(
