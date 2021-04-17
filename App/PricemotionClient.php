@@ -8,7 +8,7 @@ class PricemotionClient {
         $this->config = $config;
     }
 
-    public function getProduct(EAN $ean): Product {
+    public function getProduct(Ean $ean): Product {
         $result = $this->get('/service/', [
             'token' => $this->config->getApiToken(),
             'ean' => $ean->toString(),

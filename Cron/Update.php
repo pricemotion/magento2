@@ -13,7 +13,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\ConfigurationException;
 use Pricemotion\Magento2\App\Constants;
-use Pricemotion\Magento2\App\EAN;
+use Pricemotion\Magento2\App\Ean;
 use Pricemotion\Magento2\App\PricemotionClient;
 use Pricemotion\Magento2\App\PriceRule;
 use Pricemotion\Magento2\App\Product as PricemotionProduct;
@@ -206,7 +206,7 @@ class Update {
         $ean_string = $product->getData($this->config->requireEanAttribute());
 
         try {
-            $ean = EAN::fromString($ean_string);
+            $ean = Ean::fromString($ean_string);
         } catch (InvalidArgumentException $e) {
             $this->logger->debug(sprintf(
                 "Skipping product %d with invalid EAN '%s': %s",
