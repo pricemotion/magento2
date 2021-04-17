@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+* Add push API allowing Pricemotion to update products as soon as new data is
+  available, and without waiting for the cron job.
+
 ## 1.1.15 - 2021-04-14
 
 * Log uncaught exceptions and errors during cron run to `pricemotion.log`.
