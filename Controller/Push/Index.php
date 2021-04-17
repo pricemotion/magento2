@@ -19,8 +19,6 @@ class Index extends Action implements
     HttpGetActionInterface,
     HttpPostActionInterface,
     CsrfAwareActionInterface {
-    private $logger;
-
     public function execute() {
         try {
             $result = $this->getActionResponse();
