@@ -47,7 +47,7 @@ class ListProducts implements Action {
         $this->lowestPriceRatioAttribute = $lowestPriceRatioAttribute;
     }
 
-    public function execute(array $request) {
+    public function execute(array $request): array {
         $result = [];
 
         $this->emulator->emulate(function () use (&$result) {

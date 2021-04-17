@@ -12,7 +12,7 @@ class Status implements Action {
         $this->config = $config;
     }
 
-    public function execute(array $request) {
+    public function execute(array $request): array {
         return [
             'version' => Constants::getVersion(),
             'eanAttribute' => $this->config->getEanAttribute(),

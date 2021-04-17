@@ -10,6 +10,8 @@ use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
 use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\App\Push;
+use Pricemotion\Magento2\Logger\ArrayHandler;
+use Pricemotion\Magento2\Logger\Logger;
 use Throwable;
 
 /** @phan-suppress-next-line PhanDeprecatedClass */
@@ -17,6 +19,8 @@ class Index extends Action implements
     HttpGetActionInterface,
     HttpPostActionInterface,
     CsrfAwareActionInterface {
+    private $logger;
+
     public function execute() {
         try {
             $result = $this->getActionResponse();
@@ -86,6 +90,10 @@ class Index extends Action implements
             throw new Push\BadRequestException('Unknown action');
         }
 
+        $logger = $this->_objectManager->get(Logger::class);
+        $log = new ArrayHandler();
+        $logger->pushHandler($log);
+
         try {
             $action = ObjectManager::getInstance()->get($cls);
 
@@ -93,7 +101,7 @@ class Index extends Action implements
                 throw new Push\BadRequestException('Invalid action');
             }
 
-            return $action->execute($input);
+            $result = $action->execute($input);
         } catch (Throwable $e) {
             throw new Push\InternalException(
                 'Unhandled exception occurred during request processing',
@@ -101,6 +109,10 @@ class Index extends Action implements
                 $e
             );
         }
+
+        $result['log'] = $log->getMessages();
+
+        return $result;
     }
 
     public function createCsrfValidationException(

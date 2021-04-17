@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-$opts = getopt('k:a:');
+$opts = getopt('k:a:', [], $optind);
 
 $keypair = base64_decode(file_get_contents($opts['k']));
 if (strlen($keypair) !== 96) {
@@ -12,6 +12,13 @@ $request = [
     'action' => $opts['a'],
     'expires_at' => time() + 60,
 ];
+
+foreach (array_slice($argv, $optind) as $param) {
+    if (!preg_match('~^(.+?)=(.+)$~', $param, $match)) {
+        throw new RuntimeException("Invalid parameter: $param");
+    }
+    $request[$match[1]] = $match[2];
+}
 
 $json = json_encode($request);
 
