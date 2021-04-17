@@ -5,11 +5,8 @@ use InvalidArgumentException;
 use Magento\Catalog\Api\Data\CostInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
-use Magento\Framework\App\Area;
 use Magento\Framework\Indexer\AbstractProcessor;
 use Magento\Framework\Indexer\IndexerRegistry;
-use Magento\Store\Model\App\Emulation;
-use Magento\Store\Model\StoreManagerInterface;
 use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\ConfigurationException;
 use Pricemotion\Magento2\App\Constants;
@@ -17,6 +14,7 @@ use Pricemotion\Magento2\App\Ean;
 use Pricemotion\Magento2\App\PricemotionClient;
 use Pricemotion\Magento2\App\PriceRule;
 use Pricemotion\Magento2\App\Product as PricemotionProduct;
+use Pricemotion\Magento2\App\StoreViewEmulator;
 use Pricemotion\Magento2\Logger\Logger;
 use Pricemotion\Magento2\Model\ProductRepository;
 use Pricemotion\Magento2\Observer\ProductSave;
@@ -51,13 +49,11 @@ class Update {
 
     private $eanFilter = null;
 
-    private $storeManager;
-
-    private $emulation;
-
     private $indexerRegistry;
 
     private $productRepository;
+
+    private $emulator;
 
     public function __construct(
         Logger $logger,
@@ -65,20 +61,18 @@ class Update {
         PricemotionClient $pricemotionClient,
         Action $productAction,
         ProductSave $productSaveObserver,
-        StoreManagerInterface $storeManager,
-        Emulation $emulation,
         IndexerRegistry $indexerRegistry,
-        ProductRepository $productRepository
+        ProductRepository $productRepository,
+        StoreViewEmulator $emulator
     ) {
         $this->logger = $logger;
         $this->config = $config;
         $this->pricemotion = $pricemotionClient;
         $this->productAction = $productAction;
         $this->productSaveObserver = $productSaveObserver;
-        $this->storeManager = $storeManager;
-        $this->emulation = $emulation;
         $this->indexerRegistry = $indexerRegistry;
         $this->productRepository = $productRepository;
+        $this->emulator = $emulator;
     }
 
     public function setIgnoreUpdatedAt(bool $value): void {
@@ -94,16 +88,13 @@ class Update {
     }
 
     public function execute(): void {
-        $default_store = $this->storeManager->getDefaultStoreView();
-        if (!$default_store) {
-            $this->logger->error('No default store view is configured; aborting');
-            return;
-        }
-
-        $this->emulation->startEnvironmentEmulation($default_store->getId(), Area::AREA_ADMINHTML);
-
         try {
-            $this->doExecute();
+            $this->emulator->emulate(function () {
+                $this->doExecute();
+            });
+        } catch (ConfigurationException $e) {
+            $this->logger->error($e->getMessage());
+            return;
         } catch (Throwable $e) {
             $this->logger->critical(
                 sprintf(
@@ -115,8 +106,6 @@ class Update {
             );
             $this->logger->critical((string) $e);
             throw $e;
-        } finally {
-            $this->emulation->stopEnvironmentEmulation();
         }
     }
 
@@ -127,27 +116,22 @@ class Update {
             $run_until = time() + $this->timeLimit;
         }
 
-        try {
-            $this->priceAttribute = $this->config->getPriceAttribute();
-            $this->listPriceAttribute = $this->config->getListPriceAttribute();
+        $this->priceAttribute = $this->config->getPriceAttribute();
+        $this->listPriceAttribute = $this->config->getListPriceAttribute();
 
-            $this->logger->debug("EAN attribute: {$this->config->requireEanAttribute()}");
-            $this->logger->debug("Price attribute: {$this->priceAttribute}");
-            $this->logger->debug("List price attribute: {$this->listPriceAttribute}");
+        $this->logger->debug("EAN attribute: {$this->config->requireEanAttribute()}");
+        $this->logger->debug("Price attribute: {$this->priceAttribute}");
+        $this->logger->debug("List price attribute: {$this->listPriceAttribute}");
 
-            if ($this->eanFilter !== null) {
-                $products = $this->productRepository->getByEans($this->eanFilter);
-                if ($this->ignoreUpdatedAt) {
-                    $this->logger->warning("The `force' option is superfluous when selecting EANs to be updated");
-                }
-            } elseif ($this->ignoreUpdatedAt) {
-                $products = $this->productRepository->getAll();
-            } else {
-                $products = $this->productRepository->getForUpdate(self::UPDATE_INTERVAL);
+        if ($this->eanFilter !== null) {
+            $products = $this->productRepository->getByEans($this->eanFilter);
+            if ($this->ignoreUpdatedAt) {
+                $this->logger->warning("The `force' option is superfluous when selecting EANs to be updated");
             }
-        } catch (ConfigurationException $e) {
-            $this->logger->warning($e->getMessage());
-            return;
+        } elseif ($this->ignoreUpdatedAt) {
+            $products = $this->productRepository->getAll();
+        } else {
+            $products = $this->productRepository->getForUpdate(self::UPDATE_INTERVAL);
         }
 
         if (!$products) {

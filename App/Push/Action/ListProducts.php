@@ -1,17 +1,15 @@
 <?php
 namespace Pricemotion\Magento2\App\Push\Action;
 
-use Pricemotion\Magento2\App\Config;
 use Pricemotion\Magento2\App\Push\Action;
+use Pricemotion\Magento2\App\StoreViewEmulator;
 use Pricemotion\Magento2\Model\Attributes;
 use Pricemotion\Magento2\Model\ProductRepository;
 
 class ListProducts implements Action {
     private $productRepository;
 
-    private $config;
-
-    private $productHelper;
+    private $emulator;
 
     private $eanAttribute;
 
@@ -29,7 +27,7 @@ class ListProducts implements Action {
 
     public function __construct(
         ProductRepository $productRepository,
-        Config $config,
+        StoreViewEmulator $emulator,
         Attributes\Ean $eanAttribute,
         Attributes\Price $priceAttribute,
         Attributes\ListPrice $listPriceAttribute,
@@ -39,6 +37,7 @@ class ListProducts implements Action {
         Attributes\LowestPriceRatio $lowestPriceRatioAttribute
     ) {
         $this->productRepository = $productRepository;
+        $this->emulator = $emulator;
         $this->eanAttribute = $eanAttribute;
         $this->priceAttribute = $priceAttribute;
         $this->listPriceAttribute = $listPriceAttribute;
@@ -51,18 +50,20 @@ class ListProducts implements Action {
     public function execute(array $request) {
         $result = [];
 
-        foreach ($this->productRepository->getAll() as $product) {
-            $result[] = [
-                'id' => (int) $product->getId(),
-                'ean' => $this->eanAttribute->get($product),
-                'price' => $this->priceAttribute->get($product),
-                'listPrice' => $this->listPriceAttribute->get($product),
-                'settings' => $this->settingsAttribute->get($product),
-                'updatedAt' => $this->updatedAtAttribute->get($product),
-                'lowestPrice' => $this->lowestPriceAttribute->get($product),
-                'lowestPriceRatio' => $this->lowestPriceRatioAttribute->get($product),
-            ];
-        }
+        $this->emulator->emulate(function () use (&$result) {
+            foreach ($this->productRepository->getAll() as $product) {
+                $result[] = [
+                    'id' => (int) $product->getId(),
+                    'ean' => $this->eanAttribute->get($product),
+                    'price' => $this->priceAttribute->get($product),
+                    'listPrice' => $this->listPriceAttribute->get($product),
+                    'settings' => $this->settingsAttribute->get($product),
+                    'updatedAt' => $this->updatedAtAttribute->get($product),
+                    'lowestPrice' => $this->lowestPriceAttribute->get($product),
+                    'lowestPriceRatio' => $this->lowestPriceRatioAttribute->get($product),
+                ];
+            }
+        });
 
         return $result;
     }
