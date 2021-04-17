@@ -53,7 +53,7 @@ class ListProducts implements Action {
 
         foreach ($this->productRepository->getAll() as $product) {
             $result[] = [
-                'id' => $product->getId(),
+                'id' => (int) $product->getId(),
                 'ean' => $this->eanAttribute->get($product),
                 'price' => $this->priceAttribute->get($product),
                 'listPrice' => $this->listPriceAttribute->get($product),
