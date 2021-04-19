@@ -65,6 +65,6 @@ class ListProducts implements Action {
             }
         });
 
-        return $result;
+        return ['products' => $result];
     }
 }
