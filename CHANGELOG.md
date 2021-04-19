@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.2.0 - 2021-04-19
 
 * Add push API allowing Pricemotion to update products as soon as new data is
   available, and without waiting for the cron job.
