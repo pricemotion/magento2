@@ -37,29 +37,30 @@ class PriceRules extends Widget {
 
     protected function _prepareLayout() {
         $toolbar = $this->getToolbar();
-        assert($toolbar instanceof AbstractBlock);
 
-        $toolbar->addChild(
-            'back_button',
-            \Magento\Backend\Block\Widget\Button::class,
-            [
-                'label' => __('Back'),
-                'onclick' => 'setLocation(\'' . $this->getUrl(
-                    'catalog/product/',
-                    ['store' => $this->getRequest()->getParam('store', 0)]
-                ) . '\')',
-                'class' => 'back',
-            ]
-        );
+        if ($toolbar instanceof AbstractBlock) {
+            $toolbar->addChild(
+                'back_button',
+                \Magento\Backend\Block\Widget\Button::class,
+                [
+                    'label' => __('Back'),
+                    'onclick' => 'setLocation(\'' . $this->getUrl(
+                        'catalog/product/',
+                        ['store' => $this->getRequest()->getParam('store', 0)]
+                    ) . '\')',
+                    'class' => 'back',
+                ]
+            );
 
-        $toolbar->addChild(
-            'save_button',
-            \Magento\Backend\Block\Widget\Button::class,
-            [
-                'label' => __('Save'),
-                'class' => 'save primary pricemotion-submit',
-            ]
-        );
+            $toolbar->addChild(
+                'save_button',
+                \Magento\Backend\Block\Widget\Button::class,
+                [
+                    'label' => __('Save'),
+                    'class' => 'save primary pricemotion-submit',
+                ]
+            );
+        }
 
         return parent::_prepareLayout();
     }
