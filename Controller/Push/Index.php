@@ -8,6 +8,7 @@ use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\HTTP\PhpEnvironment\Response;
 use Pricemotion\Magento2\App\Constants;
 use Pricemotion\Magento2\App\Push;
 use Pricemotion\Magento2\Logger\ArrayHandler;
@@ -19,17 +20,19 @@ class Index extends Action implements
     HttpGetActionInterface,
     HttpPostActionInterface,
     CsrfAwareActionInterface {
-    public function execute() {
+    public function execute(): Response {
+        $response = new Response();
+
         try {
             $result = $this->getActionResponse();
         } catch (Push\Exception $e) {
-            http_response_code($e->getHttpResponseCode());
+            $response->setStatusCode($e->getHttpResponseCode());
             $result = $e->getResponse();
         }
 
-        header('Content-Type: application/json');
-        echo json_encode($result, JSON_PARTIAL_OUTPUT_ON_ERROR);
-        exit;
+        $response->setHeader('Content-Type', 'application/json');
+        $response->setBody(json_encode($result, JSON_PARTIAL_OUTPUT_ON_ERROR));
+        return $response;
     }
 
     private function getActionResponse() {
