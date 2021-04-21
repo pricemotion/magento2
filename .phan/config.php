@@ -3,6 +3,7 @@
 $vendorDirectories = [
     '.phan/stubs',
     'www/generated/code/Magento/Catalog/Model/ResourceModel/Product',
+    'www/vendor/laminas/laminas-http/src',
     'www/vendor/magento/framework',
     'www/vendor/magento/module-backend',
     'www/vendor/magento/module-catalog',
