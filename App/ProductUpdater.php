@@ -236,13 +236,13 @@ class ProductUpdater {
                     $rounded_price -= $round_precision;
                 }
             }
-            $this->logger->info(
+            $this->logger->info(sprintf(
                 'Rounding price %.4f to precision %.4f for product %d: %.4f',
                 $new_price,
                 $round_precision,
                 $product->getId(),
                 $rounded_price
-            );
+            ));
             $new_price = $rounded_price;
         }
 
