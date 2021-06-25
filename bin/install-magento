@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 root="$PWD"
-magento_version='2.4.2'
+magento_version='2.4.2-p1'
 
 if [[ $# -eq 1 ]]; then
 	magento_version="$1"

@@ -25,8 +25,7 @@ class FactoryTest extends TestCase {
             'percentageBelowAverage' => 10,
         ]);
         $this->assertInstanceOf(PercentageBelowAverage::class, $rule);
-        $document = new DOMDocument();
-        $document->loadXML("<?xml version='1.0'?>
+        $product = $this->getProductFromXml('
             <response>
                 <info>
                     <price>
@@ -37,8 +36,49 @@ class FactoryTest extends TestCase {
                 </info>
                 <prices></prices>
             </response>
-        ");
-        $product = Product::fromXmlResponse($document);
+        ');
         $this->assertEquals(90.09, $rule->calculate($product));
+    }
+
+    public function testLessThanPosition() {
+        $rule = (new Factory())->fromArray([
+            'rule' => 'lessThanPosition',
+            'lessThanPosition' => 2,
+        ]);
+        $this->assertInstanceOf(LessThanPosition::class, $rule);
+        $product = $this->getProductFromXml('
+            <response>
+                <info>
+                    <price>
+                        <min>0</min>
+                        <max>0</max>
+                        <avg>100.10</avg>
+                    </price>
+                </info>
+                <prices>
+                    <bezorg>
+                        <item>
+                            <seller>A</seller>
+                            <price>10.00</price>
+                        </item>
+                        <item>
+                            <seller>B</seller>
+                            <price>20.00</price>
+                        </item>
+                        <item>
+                            <seller>C</seller>
+                            <price>30.00</price>
+                        </item>
+                    </bezorg>
+                </prices>
+            </response>
+        ');
+        $this->assertEquals(19.99, $rule->calculate($product));
+    }
+
+    private function getProductFromXml($xml) {
+        $document = new DOMDocument();
+        $document->loadXML("<?xml version='1.0'?>{$xml}");
+        return Product::fromXmlResponse($document);
     }
 }
