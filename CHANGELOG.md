@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0 - 2021-06-25
+
+* Add option to round price up or down according to selected precision.
+
 ## 1.2.0 - 2021-04-19
 
 * Add push API allowing Pricemotion to update products as soon as new data is
