@@ -13,5 +13,4 @@ hub release create \
     --draft \
     --attach "$package" \
     --message "Pricemotion for Magento 2 v${version}" \
-    --browse \
     "v$version"
