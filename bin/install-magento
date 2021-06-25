@@ -13,6 +13,8 @@ elif [[ $# -gt 1 ]]; then
 	exit 1
 fi
 
+./bin/package
+
 retrieve() {
 	local dest="$1"
 	local url="$2"
