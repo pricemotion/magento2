@@ -35,6 +35,8 @@ class ProductUpdater {
 
     private $listPriceAttribute;
 
+    private $alwaysUpdate = false;
+
     public function __construct(
         Logger $logger,
         Config $config,
@@ -53,6 +55,10 @@ class ProductUpdater {
         $this->indexerRegistry = $indexerRegistry;
         $this->priceAttribute = $priceAttribute;
         $this->listPriceAttribute = $listPriceAttribute;
+    }
+
+    public function setAlwaysUpdate(bool $alwaysUpdate): void {
+        $this->alwaysUpdate = $alwaysUpdate;
     }
 
     public function update(Product $product): void {
@@ -246,7 +252,7 @@ class ProductUpdater {
             $new_price = $rounded_price;
         }
 
-        if (abs($this->priceAttribute->get($product) - $new_price) < 0.005) {
+        if (abs($this->priceAttribute->get($product) - $new_price) < 0.005 && !$this->alwaysUpdate) {
             $this->logger->debug(sprintf(
                 'Would adjust product %d price to %.2f according to %s, but it is already there',
                 $product->getId(),
