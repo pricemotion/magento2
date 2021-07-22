@@ -67,7 +67,7 @@ class ProductUpdater {
             $this->productAction->updateAttributes(
                 [$product->getId()],
                 $update,
-                $product->getStoreId()
+                0
             );
             foreach (self::INDEXER_IDS as $indexer_id) {
                 $indexer = $this->indexerRegistry->get($indexer_id);
