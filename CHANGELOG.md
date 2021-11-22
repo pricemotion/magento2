@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.1 - 2021-11-22
+
+* Only trigger indexers when other fields than the last updated timestamp are
+  changed.
+
 ## 1.3.0 - 2021-06-25
 
 * Add option to round price up or down according to selected precision.
