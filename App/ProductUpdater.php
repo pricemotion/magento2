@@ -69,14 +69,19 @@ class ProductUpdater {
                 $update,
                 $product->getStoreId()
             );
-            foreach (self::INDEXER_IDS as $indexer_id) {
-                $indexer = $this->indexerRegistry->get($indexer_id);
-                if ($indexer instanceof AbstractProcessor) {
-                    $indexer->reindexRow($product->getId(), true);
-                } else {
-                    /** @phan-suppress-next-line PhanDeprecatedFunction */
-                    $indexer->reindexRow($product->getId());
+            if (array_diff(array_keys($update), [Constants::ATTR_UPDATED_AT])) {
+                $this->logger->info('Reindexing product');
+                foreach (self::INDEXER_IDS as $indexer_id) {
+                    $indexer = $this->indexerRegistry->get($indexer_id);
+                    if ($indexer instanceof AbstractProcessor) {
+                        $indexer->reindexRow($product->getId(), true);
+                    } else {
+                        /** @phan-suppress-next-line PhanDeprecatedFunction */
+                        $indexer->reindexRow($product->getId());
+                    }
                 }
+            } else {
+                $this->logger->info('Only the timestamp was updated; indexes will not be touched');
             }
         }
     }
@@ -115,9 +120,15 @@ class ProductUpdater {
         }
 
         $update = [
-            Constants::ATTR_LOWEST_PRICE => $pricemotion_product->getLowestPrice(),
             Constants::ATTR_UPDATED_AT => microtime(true),
         ];
+
+        if (!$this->isApproximatelyEqual(
+            $product->getData(Constants::ATTR_LOWEST_PRICE),
+            $pricemotion_product->getLowestPrice()
+        )) {
+            $update[Constants::ATTR_LOWEST_PRICE] = $pricemotion_product->getLowestPrice();
+        }
 
         if (($new_price = $this->getNewPrice($product, $pricemotion_product)) !== null
             && ($priceAttribute = $this->priceAttribute->getCode())
@@ -129,13 +140,26 @@ class ProductUpdater {
             $product->setData($attr, $value);
         }
 
+        $previousLowestPriceRatio = $product->getData(Constants::ATTR_LOWEST_PRICE_RATIO);
         $this->productSaveObserver->setLowestPriceRatio($product);
-
-        if ($product->hasData(Constants::ATTR_LOWEST_PRICE_RATIO)) {
+        if (!$this->isApproximatelyEqual(
+            $previousLowestPriceRatio,
+            $product->getData(Constants::ATTR_LOWEST_PRICE_RATIO)
+        )) {
             $update[Constants::ATTR_LOWEST_PRICE_RATIO] = $product->getData(Constants::ATTR_LOWEST_PRICE_RATIO);
         }
 
         return $update;
+    }
+
+    private function isApproximatelyEqual($a, $b): bool {
+        if ($a === $b) {
+            return true;
+        }
+        if (is_numeric($a) && is_numeric($b) && abs((float) $a - (float) $b) < 0.00001) {
+            return true;
+        }
+        return false;
     }
 
     private function getNewPrice(Product $product, PricemotionProduct $pricemotion_product): ?float {

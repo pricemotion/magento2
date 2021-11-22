@@ -64,6 +64,8 @@ class ProductRepository {
         $this->addOptionalAttributeToSelect($collection, $this->config->getListPriceAttribute());
         $collection->addAttributeToSelect(Constants::ATTR_SETTINGS, 'left');
         $collection->addAttributeToSelect(CostInterface::COST, 'left');
+        $collection->addAttributeToSelect(Constants::ATTR_LOWEST_PRICE, 'left');
+        $collection->addAttributeToSelect(Constants::ATTR_LOWEST_PRICE_RATIO, 'left');
 
         $collection->addAttributeToFilter($this->config->requireEanAttribute(), ['neq' => '']);
 
