@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Don't break when Magento_Csp is disabled.
+
 ## 1.3.1 - 2021-11-22
 
 * Only trigger indexers when other fields than the last updated timestamp are

@@ -35,12 +35,22 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
         $this->config = $config;
         $this->localeResolver = $localeResolver;
 
-        if (class_exists(DynamicCollector::class)) {
-            $csp = ObjectManager::getInstance()->get(DynamicCollector::class);
+        if ($csp = $this->getDynamicCollector()) {
             $csp->add(new FetchPolicy('frame-src', false, [$this->getOrigin(Constants::getWebUrl())]));
         }
 
         parent::__construct($context, $data);
+    }
+
+    private function getDynamicCollector() {
+        if (!class_exists(DynamicCollector::class)) {
+            return null;
+        }
+        try {
+            return ObjectManager::getInstance()->get(DynamicCollector::class);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     protected function _beforeToHtml() {
