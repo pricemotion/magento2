@@ -46,6 +46,10 @@ class Update {
         $this->updater = $updater;
     }
 
+    public function getProductUpdater(): ProductUpdater {
+        return $this->updater;
+    }
+
     public function setIgnoreUpdatedAt(bool $value): void {
         $this->ignoreUpdatedAt = $value;
     }

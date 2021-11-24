@@ -43,6 +43,7 @@ class Update extends Command {
         $job->setTimeLimit(null);
         if ($input->getOption('force')) {
             $job->setIgnoreUpdatedAt(true);
+            $job->getProductUpdater()->setAlwaysUpdate(true);
         }
         if ($input->getOption('ean')) {
             $job->setEanFilter($input->getOption('ean'));
