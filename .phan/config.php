@@ -9,6 +9,7 @@ $vendorDirectories = [
     'www/vendor/magento/module-catalog',
     'www/vendor/magento/module-csp',
     'www/vendor/magento/module-eav',
+    'www/vendor/magento/module-indexer',
     'www/vendor/magento/module-store',
     'www/vendor/magento/module-ui',
     'www/vendor/monolog/monolog',

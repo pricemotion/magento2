@@ -1,12 +1,18 @@
 <?php
 namespace Pricemotion\Magento2\App;
 
+use Closure;
+use Generator;
 use InvalidArgumentException;
 use Magento\Catalog\Api\Data\CostInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ResourceModel\Product\Action;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Indexer\AbstractProcessor;
 use Magento\Framework\Indexer\IndexerRegistry;
+use Magento\Framework\Mview\View\Changelog;
+use Magento\Indexer\Model\Indexer\Collection;
 use Pricemotion\Magento2\App\Product as PricemotionProduct;
 use Pricemotion\Magento2\Logger\Logger;
 use Pricemotion\Magento2\Model\Attributes;
@@ -35,6 +41,8 @@ class ProductUpdater {
 
     private $listPriceAttribute;
 
+    private $indexerCollection;
+
     public function __construct(
         Logger $logger,
         Config $config,
@@ -43,7 +51,8 @@ class ProductUpdater {
         ProductSave $productSaveObserver,
         IndexerRegistry $indexerRegistry,
         Attributes\Price $priceAttribute,
-        Attributes\ListPrice $listPriceAttribute
+        Attributes\ListPrice $listPriceAttribute,
+        Collection $indexerCollection
     ) {
         $this->logger = $logger;
         $this->config = $config;
@@ -53,35 +62,97 @@ class ProductUpdater {
         $this->indexerRegistry = $indexerRegistry;
         $this->priceAttribute = $priceAttribute;
         $this->listPriceAttribute = $listPriceAttribute;
+        $this->indexerCollection = $indexerCollection;
     }
 
     public function update(Product $product): void {
         $update = $this->getUpdateData($product);
 
-        if ($update) {
-            $this->logger->info(sprintf(
-                'Update product %d: %s',
-                $product->getId(),
-                json_encode($update, JSON_PARTIAL_OUTPUT_ON_ERROR)
-            ));
+        if (!$update) {
+            return;
+        }
+
+        $this->logger->info(sprintf(
+            'Update product %d: %s',
+            $product->getId(),
+            json_encode($update, JSON_PARTIAL_OUTPUT_ON_ERROR)
+        ));
+
+        $this->transact($this->productAction->getConnection(), function () use ($product, $update): void {
+            $changelogVersions = null;
+            if (!$this->isIndexableUpdate($update)) {
+                $changelogVersions = $this->getChangelogVersions();
+            }
+
             $this->productAction->updateAttributes(
                 [$product->getId()],
                 $update,
                 $product->getStoreId()
             );
-            if (array_diff(array_keys($update), [Constants::ATTR_UPDATED_AT])) {
-                $this->logger->info('Reindexing product');
-                foreach (self::INDEXER_IDS as $indexer_id) {
-                    $indexer = $this->indexerRegistry->get($indexer_id);
-                    if ($indexer instanceof AbstractProcessor) {
-                        $indexer->reindexRow($product->getId(), true);
-                    } else {
-                        /** @phan-suppress-next-line PhanDeprecatedFunction */
-                        $indexer->reindexRow($product->getId());
-                    }
-                }
-            } else {
-                $this->logger->info('Only the timestamp was updated; indexes will not be touched');
+
+            if ($changelogVersions !== null) {
+                $this->revertChangelogs($changelogVersions, $product);
+            }
+
+            if ($this->isIndexableUpdate($update)) {
+                $this->indexProduct($product);
+            }
+        });
+    }
+
+    private function transact(AdapterInterface $conn, $fn): void {
+        $conn->beginTransaction();
+        try {
+            $fn();
+            $conn->commit();
+        } catch (\Throwable $e) {
+            $conn->rollBack();
+            throw $e;
+        }
+    }
+
+    private function getChangelogVersions(): array {
+        $result = [];
+        foreach ($this->getChangelogs() as $changelog) {
+            $result[$changelog->getName()] = $changelog->getVersion();
+        }
+        return $result;
+    }
+
+    private function isIndexableUpdate(array $update): bool {
+        return !!array_diff(array_keys($update), [Constants::ATTR_UPDATED_AT]);
+    }
+
+    private function revertChangelogs(array $previousVersions, Product $product): void {
+        foreach ($this->getChangelogs() as $changelog) {
+            if (!isset($previousVersions[$changelog->getName()])) {
+                continue;
+            }
+            $this->revertChangelog($changelog, $previousVersions[$changelog->getName()], $product);
+        }
+    }
+
+    private function revertChangelog(Changelog $changelog, int $previousVersion, Product $product): void {
+        /** @phan-closure-scope Changelog */
+        $closure = function () use ($changelog): ResourceConnection {
+            return $changelog->resource;
+        };
+        $resource = Closure::bind($closure, null, $changelog)();
+        $resource->getConnection()->delete(
+            $resource->getTableName($changelog->getName()),
+            [
+                'version_id > ?' => $previousVersion,
+                'entity_id' => $product->getId(),
+            ]
+        );
+    }
+
+    /** @return Generator<Changelog> */
+    private function getChangelogs(): Generator {
+        foreach ($this->indexerCollection->getItems() as $indexer) {
+            $changelog = $indexer->getView()->getChangelog();
+            if ($changelog instanceof Changelog) {
+                yield $changelog;
             }
         }
     }
@@ -289,5 +360,17 @@ class ProductUpdater {
         ));
 
         return $new_price;
+    }
+
+    private function indexProduct(Product $product): void {
+        foreach (self::INDEXER_IDS as $indexer_id) {
+            $indexer = $this->indexerRegistry->get($indexer_id);
+            if ($indexer instanceof AbstractProcessor) {
+                $indexer->reindexRow($product->getId(), true);
+            } else {
+                /** @phan-suppress-next-line PhanDeprecatedFunction */
+                $indexer->reindexRow($product->getId());
+            }
+        }
     }
 }
