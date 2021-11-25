@@ -78,6 +78,11 @@ class ProductRepository {
         $collection->load(false, true);
         $result = $collection->getItems();
 
+        $result = array_map(function ($item) {
+            assert($item instanceof Product);
+            return $item;
+        }, $result);
+
         $this->logger->info(sprintf(
             'Retrieved %d products in %.2f s',
             sizeof($result),
