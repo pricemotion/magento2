@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.3 - 2021-11-25
+
+- Prevent logging of the SQL query used to retrieve products for update.
+
 ## 1.3.2 - 2021-11-25
 
 * Don't break when `Magento_Csp` is disabled.
