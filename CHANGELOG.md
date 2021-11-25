@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.3 - 2021-11-25
+## Unreleased
 
 - Prevent logging of the SQL query used to retrieve products for update.
 
