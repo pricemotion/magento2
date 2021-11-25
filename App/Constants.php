@@ -28,7 +28,7 @@ class Constants {
         return self::$version = self::getComposerVersion();
     }
 
-    private static function getComposerVersion() {
+    private static function getComposerVersion(): ?string {
         $manifest = __DIR__ . '/../../../composer/installed.json';
         if (!is_file($manifest)) {
             return null;
@@ -50,6 +50,7 @@ class Constants {
             }
             return preg_replace('/^v/', '', $package['version']);
         }
+        return null;
     }
 
     public static function getWebUrl() {
