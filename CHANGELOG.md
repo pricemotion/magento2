@@ -1,8 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.3.2 - 2021-11-25
 
-* Don't break when Magento_Csp is disabled.
+* Don't break when `Magento_Csp` is disabled.
+* Roll back updates to product changelogs when only the last updated timestamp
+  is changed. This avoids the invalidation of indexes that shouldn't be
+  invalidated.
 
 ## 1.3.1 - 2021-11-22
 
