@@ -57,6 +57,7 @@ class ProductRepository {
     /** @return Product[] */
     private function getFiltered(\Closure $filter): array {
         $collection = $this->collectionFactory->create();
+        assert($collection instanceof Collection);
 
         $collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT, 'left');
         $collection->addAttributeToSelect($this->config->requireEanAttribute());
@@ -75,7 +76,6 @@ class ProductRepository {
 
         $startTime = microtime(true);
 
-        $collection->load(false, true);
         $result = $collection->getItems();
 
         $result = array_map(function ($item) {
