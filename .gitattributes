@@ -2,5 +2,4 @@
 /Makefile           export-ignore
 /test               export-ignore
 /docker*            export-ignore
-/DEVELOPMENT.TAG    export-ignore
 /.*                 export-ignore
