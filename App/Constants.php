@@ -42,10 +42,10 @@ class Constants {
             return null;
         }
         foreach ($data as $package) {
-            if ($package['name'] !== 'pricemotion/module-pricemotion') {
+            if (empty($package['name']) || empty($package['version'])) {
                 continue;
             }
-            if (empty($package['version'])) {
+            if ($package['name'] !== 'pricemotion/module-pricemotion') {
                 continue;
             }
             return preg_replace('/^v/', '', $package['version']);
