@@ -1,7 +1,6 @@
-version: '3.7'
+version: "3.7"
 
 services:
-
   web:
     build: docker/
     volumes:
@@ -13,15 +12,13 @@ services:
     networks:
       default:
         ipv4_address: 172.21.1.2
-    environment:
-      PRICEMOTION_DEVELOPMENT: 'yes'
 
   mariadb:
     image: mariadb:10.4.18
     volumes:
       - mariadb:/var/lib/mysql
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: magento
     networks:
       default:
@@ -36,10 +33,8 @@ services:
       discovery.type: single-node
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
 
-
 volumes:
   mariadb:
-
 
 networks:
   default:

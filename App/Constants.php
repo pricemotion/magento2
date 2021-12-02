@@ -61,6 +61,6 @@ class Constants {
     }
 
     private static function isDevelopmentVersion() {
-        return !!getenv('PRICEMOTION_DEVELOPMENT');
+        return file_exists(__DIR__ . '/../DEVELOPMENT.TAG');
     }
 }

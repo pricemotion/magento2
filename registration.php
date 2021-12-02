@@ -10,6 +10,6 @@ ComponentRegistrar::register(
     'Pricemotion_Magento2',
     isset($file)
     && realpath($file) == __FILE__
-    && getenv('PRICEMOTION_DEVELOPMENT') ?
+    && file_exists(__DIR__ . '/DEVELOPMENT.TAG') ?
     dirname($file) : __DIR__
 );
