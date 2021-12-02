@@ -57,7 +57,9 @@ class ProductRepository {
     /** @return Product[] */
     private function getFiltered(\Closure $filter): array {
         $collection = $this->collectionFactory->create();
-        assert($collection instanceof Collection);
+        if (!$collection instanceof Collection) {
+            throw new \LogicException('CollectionFactory::create() is expected to return an instance of Collection');
+        }
 
         $collection->addAttributeToSelect(Constants::ATTR_UPDATED_AT, 'left');
         $collection->addAttributeToSelect($this->config->requireEanAttribute());
@@ -79,7 +81,9 @@ class ProductRepository {
         $result = $collection->getItems();
 
         $result = array_map(function ($item) {
-            assert($item instanceof Product);
+            if (!$item instanceof Product) {
+                throw new \LogicException('Collection::getItems() is expected to return an array of Product instances');
+            }
             return $item;
         }, $result);
 
