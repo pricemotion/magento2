@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.3.1 - 2021-12-02
+
+- Replace assertions with if statements for Magento compliance.
+
 ## 1.3.3 - 2021-12-02
 
 - Prevent logging of the SQL query used to retrieve products for update.
