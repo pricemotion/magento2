@@ -1,8 +1,10 @@
 # Changelog
 
-## Unreleased
+## 1.3.3 - 2021-12-02
 
 - Prevent logging of the SQL query used to retrieve products for update.
+- Fix an undefined index notice when installed via Composer and there are other
+  packages installed which don't have a name.
 
 ## 1.3.2 - 2021-11-25
 
