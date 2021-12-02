@@ -1,7 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
+touch DEVELOPMENT.TAG
 
 mkdir -p www/app/code/Pricemotion
 rm -rf www/app/code/Pricemotion/Magento2
