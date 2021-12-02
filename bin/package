@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -47,7 +47,7 @@ echo "$(cat composer.json | jq '. | .version = $v' --arg v "$short_version")" > 
 version="$version" perl -p -i -e 's/\$VERSION\$/$ENV{version}/g' App/Constants.php
 
 mkdir -p "$(dirname "$out")"
-bsdtar cf "$out.$$" --format zip *
+bsdtar cf "$out.$$" --format zip --strip-components 1 .
 mv "$out.$$" "$out"
 
 echo "$out"
