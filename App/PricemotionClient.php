@@ -1,6 +1,9 @@
 <?php
 namespace Pricemotion\Magento2\App;
 
+use Pricemotion\Sdk\Data\Ean;
+use Pricemotion\Sdk\Data\Product;
+
 class PricemotionClient {
     private $config;
 

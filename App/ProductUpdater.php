@@ -13,7 +13,8 @@ use Magento\Framework\Indexer\AbstractProcessor;
 use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\Framework\Mview\View\Changelog;
 use Magento\Indexer\Model\Indexer\Collection;
-use Pricemotion\Magento2\App\Product as PricemotionProduct;
+use Pricemotion\Sdk\Data\Ean;
+use Pricemotion\Sdk\Data\Product as PricemotionProduct;
 use Pricemotion\Magento2\Logger\Logger;
 use Pricemotion\Magento2\Model\Attributes;
 use Pricemotion\Magento2\Observer\ProductSave;
@@ -245,7 +246,7 @@ class ProductUpdater {
         }
 
         try {
-            $rule = (new PriceRule\Factory())->fromArray($settings);
+            $rule = (new \Pricemotion\Sdk\PriceRule\Factory())->fromArray($settings);
         } catch (InvalidArgumentException $e) {
             $this->logger->error(sprintf(
                 'Invalid price rule for product %d: %s',
