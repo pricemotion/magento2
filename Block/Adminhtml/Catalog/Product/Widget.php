@@ -68,7 +68,7 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
             'widget_url' =>
                 Constants::getWebUrl() .
                 $this->getWidgetPath() .
-                '?' . http_build_query(['assetVersion' => Constants::getAssetVersion()]) .
+                '?' . http_build_query(['assetVersion' => Constants::getWidgetVersion()]) .
                 '#' . json_encode($parameters),
             'form_key' => $this->getFormKey(),
         ];
@@ -81,7 +81,7 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
 
     public function getViewFileUrl($fileId, array $params = []) {
         $url = parent::getViewFileUrl($fileId, $params);
-        $url .= '?v=' . Constants::getAssetVersion();
+        $url .= '?v=' . Constants::getVersion();
         return $url;
     }
 
