@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.4 - 2021-03-15
+
+- Don't rely on version detection for widget version.
+
 ## 1.3.3.1 - 2021-12-02
 
 - Replace assertions with if statements for Magento compliance.
