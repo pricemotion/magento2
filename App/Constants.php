@@ -14,11 +14,8 @@ class Constants {
 
     const PUBKEY_SIGN = 'jgv3KkVIW4VzKbq8g6fs/XvhZk56BqJeU2/ch2tqm7k=';
 
-    public static function getAssetVersion() {
-        if (self::isDevelopmentVersion()) {
-            return $_SERVER['REQUEST_TIME'];
-        }
-        return self::getVersion();
+    public static function getWidgetVersion() {
+        return '1.3';
     }
 
     public static function getVersion() {
