@@ -1,25 +1,31 @@
 <?php
-namespace Pricemotion\Magento2\Setup;
+
+namespace Pricemotion\Magento2\Setup\Patch\Data;
 
 use Magento\Catalog\Model\Product;
 use Magento\Eav\Model\Entity\Attribute\Backend\JsonEncoded;
 use Magento\Eav\Setup\EavSetup;
-use Magento\Framework\Setup\InstallDataInterface;
-use Magento\Framework\Setup\ModuleContextInterface;
-use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Pricemotion\Magento2\App\Constants;
 
-/** @phan-suppress-next-line PhanUnreferencedClass */
-class InstallData implements InstallDataInterface {
+class AttributesPatch implements DataPatchInterface, PatchRevertableInterface {
     private $eavSetup;
 
-    public function __construct(EavSetup $eav_setup) {
-        $this->eavSetup = $eav_setup;
+    public function __construct(EavSetup $eavSetup) {
+        $this->eavSetup = $eavSetup;
     }
 
-    public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context) {
-        $this->eavSetup->addAttribute(
-            Product::ENTITY,
+    public static function getDependencies(): array {
+        return [];
+    }
+
+    public function getAliases(): array {
+        return [];
+    }
+
+    public function apply(): self {
+        $this->addProductAttribute(
             Constants::ATTR_LOWEST_PRICE,
             [
                 'label' => 'Lowest Price',
@@ -32,8 +38,7 @@ class InstallData implements InstallDataInterface {
             ]
         );
 
-        $this->eavSetup->addAttribute(
-            Product::ENTITY,
+        $this->addProductAttribute(
             Constants::ATTR_LOWEST_PRICE_RATIO,
             [
                 'label' => 'Price Difference (%)',
@@ -46,8 +51,7 @@ class InstallData implements InstallDataInterface {
             ]
         );
 
-        $this->eavSetup->addAttribute(
-            Product::ENTITY,
+        $this->addProductAttribute(
             Constants::ATTR_UPDATED_AT,
             [
                 'label' => 'Pricemotion Timestamp',
@@ -59,8 +63,7 @@ class InstallData implements InstallDataInterface {
             ]
         );
 
-        $this->eavSetup->addAttribute(
-            Product::ENTITY,
+        $this->addProductAttribute(
             Constants::ATTR_SETTINGS,
             [
                 'label' => 'Pricemotion Settings',
@@ -71,5 +74,21 @@ class InstallData implements InstallDataInterface {
                 'backend' => JsonEncoded::class,
             ]
         );
+
+        return $this;
+    }
+
+    private function addProductAttribute(string $attrName, array $options): void {
+        if ($this->eavSetup->getAttribute(Product::ENTITY, $attrName)) {
+            return;
+        }
+        $this->eavSetup->addAttribute(Product::ENTITY, $attrName, $options);
+    }
+
+    public function revert(): void {
+        $this->eavSetup->removeAttribute(Product::ENTITY, Constants::ATTR_LOWEST_PRICE);
+        $this->eavSetup->removeAttribute(Product::ENTITY, Constants::ATTR_LOWEST_PRICE_RATIO);
+        $this->eavSetup->removeAttribute(Product::ENTITY, Constants::ATTR_UPDATED_AT);
+        $this->eavSetup->removeAttribute(Product::ENTITY, Constants::ATTR_SETTINGS);
     }
 }
