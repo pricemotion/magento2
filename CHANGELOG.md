@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.4.1 - 2022-04-07
+
+- Magento standards: Replace `InstallData` script with `Script\Patch\Data` script.
+
 ## 1.3.4 - 2021-03-15
 
 - Don't rely on version detection for widget version.
