@@ -11,7 +11,7 @@ class ArrayHandler extends AbstractProcessingHandler {
         parent::__construct($level, $bubble);
     }
 
-    protected function write(array $record) {
+    protected function write(array $record): void {
         $this->messages[] = (string) $record['formatted'];
     }
 
