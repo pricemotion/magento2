@@ -17,7 +17,7 @@ $vendorDirectories = [
 ];
 
 return [
-    'target_php_version' => '7.1',
+    'target_php_version' => '7.4',
     'directory_list' => iterator_to_array((function () use ($vendorDirectories) {
         foreach (scandir(__DIR__ . '/..') as $file) {
             if (is_dir(__DIR__ . '/../' . $file)
