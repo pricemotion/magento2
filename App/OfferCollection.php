@@ -20,7 +20,7 @@ class OfferCollection implements \IteratorAggregate {
         return new self($offers);
     }
 
-    public function getIterator() {
+    public function getIterator(): \Traversable {
         foreach ($this->offers as $offer) {
             yield $offer;
         }
