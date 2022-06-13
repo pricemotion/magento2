@@ -1,0 +1,46 @@
+FROM alpine:3.16
+
+RUN apk add --no-cache \
+    bash \
+    gcc \
+    libsodium-dev \
+    make \
+    musl-dev \
+    shadow \
+    sudo \
+    php81-apache2 \
+    php81-bcmath \
+    php81-cli \
+    php81-ctype \
+    php81-curl \
+    php81-dev \
+    php81-dom \
+    php81-fileinfo \
+    php81-gd \
+    php81-iconv \
+    php81-intl \
+    php81-json \
+    php81-mbstring \
+    php81-opcache \
+    php81-openssl \
+    php81-pdo_mysql \
+    php81-pear \
+    php81-phar \
+    php81-session \
+    php81-simplexml \
+    php81-soap \
+    php81-sockets \
+    php81-sodium \
+    php81-tokenizer \
+    php81-xml \
+    php81-xmlwriter \
+    php81-xsl \
+    php81-zip
+
+RUN rm -rf /var/www/localhost/htdocs && ln -sfn ../../../data/www/pub /var/www/localhost/htdocs
+
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT /entrypoint.sh

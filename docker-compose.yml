@@ -2,7 +2,9 @@ version: "3.7"
 
 services:
   web:
-    build: docker/
+    build:
+      context: ./docker
+      dockerfile: ${MAGENTO2_PHP_DOCKERFILE}
     volumes:
       - .:/data
       - ./docker/apache2.conf:/etc/apache2/conf.d/local.conf
