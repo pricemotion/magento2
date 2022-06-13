@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.5 - 2022-06-13
+
+- Fix compatibility with PHP 8.1.
+
 ## 1.3.4.1 - 2022-04-07
 
 - Magento standards: Replace `InstallData` script with `Script\Patch\Data` script.
