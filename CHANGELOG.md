@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.5.1 - 2022-06-13
+
+- Fix IteratorAggregate extension on PHP 8.1.
+
 ## 1.3.5 - 2022-06-13
 
 - Fix compatibility with PHP 8.1.
