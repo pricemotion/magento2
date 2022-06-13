@@ -2,6 +2,7 @@ FROM alpine:3.16
 
 RUN apk add --no-cache \
     bash \
+    coreutils \
     gcc \
     libsodium-dev \
     make \
@@ -36,6 +37,8 @@ RUN apk add --no-cache \
     php81-xmlwriter \
     php81-xsl \
     php81-zip
+
+RUN ln -sfnr /usr/bin/php81 /usr/local/bin/php
 
 RUN rm -rf /var/www/localhost/htdocs && ln -sfn ../../../data/www/pub /var/www/localhost/htdocs
 
