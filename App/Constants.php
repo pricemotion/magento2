@@ -51,7 +51,7 @@ class Constants {
     }
 
     public static function getWebUrl() {
-        if (self::isDevelopmentVersion()) {
+        if (self::isDevelopmentVersion() && !@file_exists(__DIR__ . '/../PUBLIC_WIDGET.TAG')) {
             return 'http://localhost:8080';
         }
         return 'https://www.pricemotion.nl/app';
