@@ -406,11 +406,15 @@ class ProductUpdater {
         foreach (self::INDEXER_IDS as $indexer_id) {
             $indexer = $this->indexerRegistry->get($indexer_id);
             if ($indexer instanceof AbstractProcessor) {
-                $indexer->reindexRow($product->getId(), true);
+                $this->indexProductWithAbstractProcessor($indexer, $product);
             } else {
                 /** @phan-suppress-next-line PhanDeprecatedFunction */
                 $indexer->reindexRow($product->getId());
             }
         }
+    }
+
+    private function indexProductWithAbstractProcessor(AbstractProcessor $indexer, Product $product): void {
+        $indexer->reindexRow($product->getId(), true);
     }
 }

@@ -9,6 +9,7 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Pricemotion\Magento2\App\Constants;
 
+/** @phan-suppress-next-line PhanUnreferencedClass */
 class AttributesPatch implements DataPatchInterface, PatchRevertableInterface {
     private $eavSetup;
 
