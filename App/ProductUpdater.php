@@ -18,6 +18,7 @@ use Pricemotion\Magento2\Logger\Logger;
 use Pricemotion\Magento2\Model\Attributes;
 use Pricemotion\Magento2\Observer\ProductSave;
 use RuntimeException;
+use Magento\Framework\Mview\View\ChangelogTableNotExistsException;
 
 class ProductUpdater {
     private const INDEXER_IDS = [
@@ -114,7 +115,10 @@ class ProductUpdater {
     private function getChangelogVersions(): array {
         $result = [];
         foreach ($this->getChangelogs() as $changelog) {
-            $result[$changelog->getName()] = $changelog->getVersion();
+            try {
+                $result[$changelog->getName()] = $changelog->getVersion();
+            } catch (ChangelogTableNotExistsException $e) {
+            }
         }
         return $result;
     }
