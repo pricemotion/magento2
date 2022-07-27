@@ -172,6 +172,10 @@ class ProductUpdater {
             return [];
         }
 
+        if (!$this->config->shouldUpdateProductsWithoutPriceRule() && !$this->getPriceRule($product)) {
+            return [];
+        }
+
         $this->logger->info(sprintf(
             'Updating product %d with EAN %s',
             $product->getId(),
@@ -234,24 +238,13 @@ class ProductUpdater {
     }
 
     private function getNewPrice(Product $product, PricemotionProduct $pricemotion_product): ?float {
-        $settings = $product->getData(Constants::ATTR_SETTINGS);
+        $settings = $this->getSettings($product);
         if (!$settings) {
             return null;
         }
 
-        $settings = json_decode($settings, true);
-        if (!is_array($settings) || !$settings) {
-            return null;
-        }
-
-        try {
-            $rule = (new PriceRule\Factory())->fromArray($settings);
-        } catch (InvalidArgumentException $e) {
-            $this->logger->error(sprintf(
-                'Invalid price rule for product %d: %s',
-                $product->getId(),
-                $e->getMessage()
-            ));
+        $rule = $this->getPriceRule($product);
+        if (!$rule) {
             return null;
         }
 
@@ -360,6 +353,44 @@ class ProductUpdater {
         ));
 
         return $new_price;
+    }
+
+    private function getSettings(Product $product): array {
+        $settings = $product->getData(Constants::ATTR_SETTINGS);
+        if (!$settings) {
+            return [];
+        }
+
+        $settings = json_decode($settings, true);
+        if (!is_array($settings)) {
+            return [];
+        }
+
+        return $settings;
+    }
+
+    private function getPriceRule(Product $product): ?PriceRule\PriceRuleInterface {
+        $settings = $this->getSettings($product);
+        if (!$settings) {
+            return null;
+        }
+
+        try {
+            $rule = (new PriceRule\Factory())->fromArray($settings);
+        } catch (InvalidArgumentException $e) {
+            $this->logger->error(sprintf(
+                'Invalid price rule for product %d: %s',
+                $product->getId(),
+                $e->getMessage()
+            ));
+            return null;
+        }
+
+        if ($rule instanceof PriceRule\Disabled) {
+            return null;
+        }
+
+        return $rule;
     }
 
     private function indexProduct(Product $product): void {

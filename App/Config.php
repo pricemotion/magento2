@@ -2,6 +2,7 @@
 namespace Pricemotion\Magento2\App;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Pricemotion\Magento2\Model\Config\Source;
 
 class Config {
     private $config;
@@ -57,5 +58,9 @@ class Config {
             '+' => '-',
             '/' => '_',
         ]);
+    }
+
+    public function shouldUpdateProductsWithoutPriceRule(): bool {
+        return $this->config->getValue('pricemotion/general/products') !== Source\Products::VALUE_WITH_RULES;
     }
 }
