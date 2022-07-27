@@ -58,6 +58,6 @@ class Constants {
     }
 
     private static function isDevelopmentVersion() {
-        return file_exists(__DIR__ . '/../DEVELOPMENT.TAG');
+        return @file_exists(__DIR__ . '/../DEVELOPMENT.TAG');
     }
 }
