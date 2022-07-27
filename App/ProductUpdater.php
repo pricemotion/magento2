@@ -177,6 +177,11 @@ class ProductUpdater {
         }
 
         if (!$this->config->shouldUpdateProductsWithoutPriceRule() && !$this->getPriceRule($product)) {
+            $this->logger->debug(sprintf(
+                "Skipping product %d with EAN %s because it doesn't have price rules",
+                $product->getId(),
+                $ean->toString()
+            ));
             return [];
         }
 
