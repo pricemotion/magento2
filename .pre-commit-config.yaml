@@ -3,6 +3,9 @@ repos:
     rev: 50c5478ed9e10bf360335449280cf2a67f4edb7a
     hooks:
       - id: prettier
+        additional_dependencies:
+          - "prettier@2.7.1"
+          - "@prettier/plugin-php@0.18.9"
   - repo: https://github.com/apeschar/pre-commit-phan
     rev: ebd3bfb237c2aceb49fec2198ac69a64209a74a9
     hooks:
