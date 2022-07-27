@@ -51,13 +51,13 @@ class Constants {
     }
 
     public static function getWebUrl() {
-        if (self::isDevelopmentVersion() && !@file_exists(__DIR__ . '/../PUBLIC_WIDGET.TAG')) {
+        if (self::isDevelopmentVersion() && !file_exists(__DIR__ . '/../PUBLIC_WIDGET.TAG')) {
             return 'http://localhost:8080';
         }
         return 'https://www.pricemotion.nl/app';
     }
 
     private static function isDevelopmentVersion() {
-        return @file_exists(__DIR__ . '/../DEVELOPMENT.TAG');
+        return file_exists(__DIR__ . '/../DEVELOPMENT.TAG');
     }
 }

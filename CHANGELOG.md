@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.6.1 - 2022-07-27
+
+- Magento Marketplace: Don't silence errors.
+
 ## 1.3.6 - 2022-07-27
 
 - Add setting to disable updates for products that do not have price rules set.
