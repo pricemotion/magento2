@@ -16,31 +16,23 @@ class ProductRepository {
 
     private $logger;
 
-    public function __construct(
-        CollectionFactory $collectionFactory,
-        Config $config,
-        Logger $logger
-    ) {
+    public function __construct(CollectionFactory $collectionFactory, Config $config, Logger $logger) {
         $this->collectionFactory = $collectionFactory;
         $this->config = $config;
         $this->logger = $logger;
     }
 
     public function getAll(): array {
-        return $this->getFiltered(function (): void {
-        });
+        return $this->getFiltered(function (): void {});
     }
 
     public function getByEans(array $eans): array {
         return $this->getFiltered(function (Collection $collection) use ($eans): void {
             $collection->addAttributeToFilter(
                 $this->config->requireEanAttribute(),
-                array_map(
-                    function ($ean) {
-                        return ['eq' => $ean];
-                    },
-                    $eans
-                )
+                array_map(function ($ean) {
+                    return ['eq' => $ean];
+                }, $eans),
             );
         });
     }
@@ -87,19 +79,12 @@ class ProductRepository {
             return $item;
         }, $result);
 
-        $this->logger->info(sprintf(
-            'Retrieved %d products in %.2f s',
-            sizeof($result),
-            microtime(true) - $startTime
-        ));
+        $this->logger->info(sprintf('Retrieved %d products in %.2f s', sizeof($result), microtime(true) - $startTime));
 
         return $result;
     }
 
-    private function addOptionalAttributeToSelect(
-        Collection $collection,
-        ?string $attribute
-    ): void {
+    private function addOptionalAttributeToSelect(Collection $collection, ?string $attribute): void {
         if ($attribute !== null) {
             $collection->addAttributeToSelect($attribute, 'left');
         }

@@ -1,6 +1,5 @@
 #!/usr/bin/env php
 <?php
-
 $opts = getopt('k:a:', [], $optind);
 
 $keypair = base64_decode(file_get_contents($opts['k']));
@@ -25,3 +24,4 @@ $json = json_encode($request);
 fprintf(STDERR, "Request payload: %s\n", $json);
 
 echo base64_encode(sodium_crypto_sign($json, sodium_crypto_sign_secretkey($keypair)));
+

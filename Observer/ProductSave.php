@@ -18,10 +18,7 @@ class ProductSave implements ObserverInterface {
 
     private $listPriceAttribute;
 
-    public function __construct(
-        Logger $logger,
-        Config $config
-    ) {
+    public function __construct(Logger $logger, Config $config) {
         $this->logger = $logger;
         $this->eanAttribute = $config->getEanAttribute();
         $this->priceAttribute = $config->getPriceAttribute();
@@ -45,23 +42,24 @@ class ProductSave implements ObserverInterface {
                 $this->priceAttribute,
                 $this->listPriceAttribute,
                 CostInterface::COST,
-                Constants::ATTR_SETTINGS
-            ))
-            && !$this->changed($product, Constants::ATTR_UPDATED_AT)
+                Constants::ATTR_SETTINGS,
+            )) &&
+            !$this->changed($product, Constants::ATTR_UPDATED_AT)
         ) {
-            $this->logger->debug(sprintf(
-                'Attributes %s changed on product %d; resetting update timestamp...',
-                implode(', ', $changed_attributes),
-                $product->getId()
-            ));
+            $this->logger->debug(
+                sprintf(
+                    'Attributes %s changed on product %d; resetting update timestamp...',
+                    implode(', ', $changed_attributes),
+                    $product->getId(),
+                ),
+            );
             $product->setData(Constants::ATTR_UPDATED_AT, null);
         }
 
         if ($this->changed($product, $this->eanAttribute)) {
-            $this->logger->debug(sprintf(
-                'EAN changed on product %d; resetting update timestamp and lowest price...',
-                $product->getId()
-            ));
+            $this->logger->debug(
+                sprintf('EAN changed on product %d; resetting update timestamp and lowest price...', $product->getId()),
+            );
             $product->setData(Constants::ATTR_UPDATED_AT, null);
             $product->setData(Constants::ATTR_LOWEST_PRICE, null);
         }
@@ -70,17 +68,19 @@ class ProductSave implements ObserverInterface {
     }
 
     public function setLowestPriceRatio(Product $product) {
-        if (!$this->priceAttribute
-            || !$product->hasData($this->priceAttribute)
-            || !$product->hasData(Constants::ATTR_LOWEST_PRICE)
+        if (
+            !$this->priceAttribute ||
+            !$product->hasData($this->priceAttribute) ||
+            !$product->hasData(Constants::ATTR_LOWEST_PRICE)
         ) {
             return;
         }
 
         $result = null;
 
-        if (($price = (float) $product->getData($this->priceAttribute))
-            && ($lowest_price = (float) $product->getData(Constants::ATTR_LOWEST_PRICE))
+        if (
+            ($price = (float) $product->getData($this->priceAttribute)) &&
+            ($lowest_price = (float) $product->getData(Constants::ATTR_LOWEST_PRICE))
         ) {
             $result = $price / $lowest_price;
         }

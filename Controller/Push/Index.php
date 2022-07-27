@@ -16,10 +16,7 @@ use Pricemotion\Magento2\Logger\Logger;
 use Throwable;
 
 /** @phan-suppress-next-line PhanDeprecatedClass */
-class Index extends Action implements
-    HttpGetActionInterface,
-    HttpPostActionInterface,
-    CsrfAwareActionInterface {
+class Index extends Action implements HttpGetActionInterface, HttpPostActionInterface, CsrfAwareActionInterface {
     public function execute(): Response {
         $response = new Response();
 
@@ -62,29 +59,26 @@ class Index extends Action implements
 
         if ($input['expires_at'] > time() + 86400) {
             throw new Push\BadRequestException(
-                'Request expiry is too far into the future; ' .
-                'server time is ' . gmdate('Y-m-d H:m:s')
+                'Request expiry is too far into the future; ' . 'server time is ' . gmdate('Y-m-d H:m:s'),
             );
         }
 
         if ($input['expires_at'] < time()) {
-            throw new Push\BadRequestException(
-                'Request has expired; ' .
-                'server time is ' . gmdate('Y-m-d H:m:s')
-            );
+            throw new Push\BadRequestException('Request has expired; ' . 'server time is ' . gmdate('Y-m-d H:m:s'));
         }
 
         if (empty($input['action'])) {
             throw new Push\BadRequestException('Request is missing action');
         }
 
-        $cls = 'Pricemotion\\Magento2\\App\\Push\\Action\\' .
+        $cls =
+            'Pricemotion\\Magento2\\App\\Push\\Action\\' .
             preg_replace_callback(
                 '~(?:^|_)([a-z])~i',
                 function ($match) {
                     return strtoupper($match[1]);
                 },
-                $input['action']
+                $input['action'],
             );
 
         if (!class_exists($cls)) {
@@ -104,11 +98,7 @@ class Index extends Action implements
 
             $result = $action->execute($input);
         } catch (Throwable $e) {
-            throw new Push\InternalException(
-                'Unhandled exception occurred during request processing',
-                0,
-                $e
-            );
+            throw new Push\InternalException('Unhandled exception occurred during request processing', 0, $e);
         }
 
         $result['log'] = $log->getMessages();
@@ -116,9 +106,7 @@ class Index extends Action implements
         return $result;
     }
 
-    public function createCsrfValidationException(
-        RequestInterface $request
-    ): ?InvalidRequestException {
+    public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException {
         return null;
     }
 

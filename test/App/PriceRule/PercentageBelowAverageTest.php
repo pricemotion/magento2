@@ -7,6 +7,6 @@ use Pricemotion\Magento2\App\ProductTest;
 class PercentageBelowAverageTest extends TestCase {
     public function testCalculate() {
         $product = ProductTest::getProduct();
-        $this->assertEquals(45.50, (new PercentageBelowAverage(25))->calculate($product));
+        $this->assertEquals(45.5, (new PercentageBelowAverage(25))->calculate($product));
     }
 }

@@ -73,11 +73,9 @@ class ProductUpdater {
             return;
         }
 
-        $this->logger->info(sprintf(
-            'Update product %d: %s',
-            $product->getId(),
-            json_encode($update, JSON_PARTIAL_OUTPUT_ON_ERROR)
-        ));
+        $this->logger->info(
+            sprintf('Update product %d: %s', $product->getId(), json_encode($update, JSON_PARTIAL_OUTPUT_ON_ERROR)),
+        );
 
         $this->transact($this->productAction->getConnection(), function () use ($product, $update): void {
             $changelogVersions = null;
@@ -85,11 +83,7 @@ class ProductUpdater {
                 $changelogVersions = $this->getChangelogVersions();
             }
 
-            $this->productAction->updateAttributes(
-                [$product->getId()],
-                $update,
-                $product->getStoreId()
-            );
+            $this->productAction->updateAttributes([$product->getId()], $update, $product->getStoreId());
 
             if ($changelogVersions !== null) {
                 $this->revertChangelogs($changelogVersions, $product);
@@ -142,13 +136,10 @@ class ProductUpdater {
             return $changelog->resource;
         };
         $resource = Closure::bind($closure, null, $changelog)();
-        $resource->getConnection()->delete(
-            $resource->getTableName($changelog->getName()),
-            [
-                'version_id > ?' => $previousVersion,
-                'entity_id' => $product->getId(),
-            ]
-        );
+        $resource->getConnection()->delete($resource->getTableName($changelog->getName()), [
+            'version_id > ?' => $previousVersion,
+            'entity_id' => $product->getId(),
+        ]);
     }
 
     /** @return Generator<Changelog> */
@@ -167,39 +158,41 @@ class ProductUpdater {
         try {
             $ean = Ean::fromString($ean_string);
         } catch (InvalidArgumentException $e) {
-            $this->logger->debug(sprintf(
-                "Skipping product %d with invalid EAN '%s': %s",
-                $product->getId(),
-                $ean_string,
-                $e->getMessage()
-            ));
+            $this->logger->debug(
+                sprintf(
+                    "Skipping product %d with invalid EAN '%s': %s",
+                    $product->getId(),
+                    $ean_string,
+                    $e->getMessage(),
+                ),
+            );
             return [];
         }
 
         if (!$this->config->shouldUpdateProductsWithoutPriceRule() && !$this->getPriceRule($product)) {
-            $this->logger->debug(sprintf(
-                "Skipping product %d with EAN %s because it doesn't have price rules",
-                $product->getId(),
-                $ean->toString()
-            ));
+            $this->logger->debug(
+                sprintf(
+                    "Skipping product %d with EAN %s because it doesn't have price rules",
+                    $product->getId(),
+                    $ean->toString(),
+                ),
+            );
             return [];
         }
 
-        $this->logger->info(sprintf(
-            'Updating product %d with EAN %s',
-            $product->getId(),
-            $ean->toString()
-        ));
+        $this->logger->info(sprintf('Updating product %d with EAN %s', $product->getId(), $ean->toString()));
 
         try {
             $pricemotion_product = $this->pricemotion->getProduct($ean);
         } catch (RuntimeException $e) {
-            $this->logger->error(sprintf(
-                'Could not get Pricemotion data for product %d with EAN %s: %s',
-                $product->getId(),
-                $ean->toString(),
-                $e->getMessage()
-            ));
+            $this->logger->error(
+                sprintf(
+                    'Could not get Pricemotion data for product %d with EAN %s: %s',
+                    $product->getId(),
+                    $ean->toString(),
+                    $e->getMessage(),
+                ),
+            );
             return [Constants::ATTR_UPDATED_AT => microtime(true)];
         }
 
@@ -207,15 +200,18 @@ class ProductUpdater {
             Constants::ATTR_UPDATED_AT => microtime(true),
         ];
 
-        if (!$this->isApproximatelyEqual(
-            $product->getData(Constants::ATTR_LOWEST_PRICE),
-            $pricemotion_product->getLowestPrice()
-        )) {
+        if (
+            !$this->isApproximatelyEqual(
+                $product->getData(Constants::ATTR_LOWEST_PRICE),
+                $pricemotion_product->getLowestPrice(),
+            )
+        ) {
             $update[Constants::ATTR_LOWEST_PRICE] = $pricemotion_product->getLowestPrice();
         }
 
-        if (($new_price = $this->getNewPrice($product, $pricemotion_product)) !== null
-            && ($priceAttribute = $this->priceAttribute->getCode())
+        if (
+            ($new_price = $this->getNewPrice($product, $pricemotion_product)) !== null &&
+            ($priceAttribute = $this->priceAttribute->getCode())
         ) {
             $update[$priceAttribute] = $new_price;
         }
@@ -226,10 +222,12 @@ class ProductUpdater {
 
         $previousLowestPriceRatio = $product->getData(Constants::ATTR_LOWEST_PRICE_RATIO);
         $this->productSaveObserver->setLowestPriceRatio($product);
-        if (!$this->isApproximatelyEqual(
-            $previousLowestPriceRatio,
-            $product->getData(Constants::ATTR_LOWEST_PRICE_RATIO)
-        )) {
+        if (
+            !$this->isApproximatelyEqual(
+                $previousLowestPriceRatio,
+                $product->getData(Constants::ATTR_LOWEST_PRICE_RATIO),
+            )
+        ) {
             $update[Constants::ATTR_LOWEST_PRICE_RATIO] = $product->getData(Constants::ATTR_LOWEST_PRICE_RATIO);
         }
 
@@ -263,10 +261,12 @@ class ProductUpdater {
         }
 
         if (!$this->priceAttribute->getCode()) {
-            $this->logger->error(sprintf(
-                'Prices rules are configured for product %d, but no price attribute is configured',
-                $product->getId()
-            ));
+            $this->logger->error(
+                sprintf(
+                    'Prices rules are configured for product %d, but no price attribute is configured',
+                    $product->getId(),
+                ),
+            );
             return null;
         }
 
@@ -274,49 +274,56 @@ class ProductUpdater {
             $minimum_margin = (float) $settings['minimumMargin'];
             $cost = (float) $product->getData(CostInterface::COST);
             if ($cost < 0.01) {
-                $this->logger->error(sprintf(
-                    'Margin protection enabled, but no cost price found for product %d',
-                    $product->getId()
-                ));
+                $this->logger->error(
+                    sprintf('Margin protection enabled, but no cost price found for product %d', $product->getId()),
+                );
                 return null;
             }
             $minimum_price = round($cost * (1 + $minimum_margin / 100), 2);
             if ($new_price < $minimum_price) {
-                $this->logger->info(sprintf(
-                    'Using minimum margin protection price %.4f instead of %.4f for product %d (%.4f + %.4f%%)',
-                    $minimum_price,
-                    $new_price,
-                    $product->getId(),
-                    $cost,
-                    $minimum_margin
-                ));
+                $this->logger->info(
+                    sprintf(
+                        'Using minimum margin protection price %.4f instead of %.4f for product %d (%.4f + %.4f%%)',
+                        $minimum_price,
+                        $new_price,
+                        $product->getId(),
+                        $cost,
+                        $minimum_margin,
+                    ),
+                );
                 $new_price = $minimum_price;
             }
         }
 
         if (!empty($settings['limitListPriceDiscount'])) {
             if (!$this->listPriceAttribute->getCode()) {
-                $this->logger->warning(sprintf(
-                    'Maximum list price discount set for product %d, but no list price attribute is configured',
-                    $product->getId()
-                ));
+                $this->logger->warning(
+                    sprintf(
+                        'Maximum list price discount set for product %d, but no list price attribute is configured',
+                        $product->getId(),
+                    ),
+                );
             } elseif (($list_price = $this->listPriceAttribute->get($product)) < 0.01) {
-                $this->logger->warning(sprintf(
-                    'Maximum list price discount enabled, but no list price found for product %d',
-                    $product->getId()
-                ));
+                $this->logger->warning(
+                    sprintf(
+                        'Maximum list price discount enabled, but no list price found for product %d',
+                        $product->getId(),
+                    ),
+                );
             } else {
                 $maximum_discount = (float) $settings['maximumListPriceDiscount'];
                 $minimum_price = round($list_price * (1 - $maximum_discount / 100), 2);
                 if ($new_price < $minimum_price) {
-                    $this->logger->info(sprintf(
-                        'Using maximum list price discount price %.4f instead of %.4f for product %d (%.4f - %.4f%%)',
-                        $minimum_price,
-                        $new_price,
-                        $product->getId(),
-                        $list_price,
-                        $maximum_discount
-                    ));
+                    $this->logger->info(
+                        sprintf(
+                            'Using maximum list price discount price %.4f instead of %.4f for product %d (%.4f - %.4f%%)',
+                            $minimum_price,
+                            $new_price,
+                            $product->getId(),
+                            $list_price,
+                            $maximum_discount,
+                        ),
+                    );
                     $new_price = $minimum_price;
                 }
             }
@@ -333,33 +340,39 @@ class ProductUpdater {
                     $rounded_price -= $round_precision;
                 }
             }
-            $this->logger->info(sprintf(
-                'Rounding price %.4f to precision %.4f for product %d: %.4f',
-                $new_price,
-                $round_precision,
-                $product->getId(),
-                $rounded_price
-            ));
+            $this->logger->info(
+                sprintf(
+                    'Rounding price %.4f to precision %.4f for product %d: %.4f',
+                    $new_price,
+                    $round_precision,
+                    $product->getId(),
+                    $rounded_price,
+                ),
+            );
             $new_price = $rounded_price;
         }
 
         if (abs($this->priceAttribute->get($product) - $new_price) < 0.005) {
-            $this->logger->debug(sprintf(
-                'Would adjust product %d price to %.2f according to %s, but it is already there',
-                $product->getId(),
-                $new_price,
-                get_class($rule)
-            ));
+            $this->logger->debug(
+                sprintf(
+                    'Would adjust product %d price to %.2f according to %s, but it is already there',
+                    $product->getId(),
+                    $new_price,
+                    get_class($rule),
+                ),
+            );
             return null;
         }
 
-        $this->logger->info(sprintf(
-            'Adjusting product %d price from %.2f to %.2f according to %s',
-            $product->getId(),
-            $this->priceAttribute->get($product),
-            $new_price,
-            get_class($rule)
-        ));
+        $this->logger->info(
+            sprintf(
+                'Adjusting product %d price from %.2f to %.2f according to %s',
+                $product->getId(),
+                $this->priceAttribute->get($product),
+                $new_price,
+                get_class($rule),
+            ),
+        );
 
         return $new_price;
     }
@@ -387,11 +400,7 @@ class ProductUpdater {
         try {
             $rule = (new PriceRule\Factory())->fromArray($settings);
         } catch (InvalidArgumentException $e) {
-            $this->logger->error(sprintf(
-                'Invalid price rule for product %d: %s',
-                $product->getId(),
-                $e->getMessage()
-            ));
+            $this->logger->error(sprintf('Invalid price rule for product %d: %s', $product->getId(), $e->getMessage()));
             return null;
         }
 

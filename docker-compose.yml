@@ -1,4 +1,4 @@
-version: "3.7"
+version: '3.7'
 
 services:
   web:
@@ -20,7 +20,7 @@ services:
     volumes:
       - mariadb:/var/lib/mysql
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
       MYSQL_DATABASE: magento
     networks:
       default:
@@ -33,7 +33,7 @@ services:
         ipv4_address: 172.21.1.4
     environment:
       discovery.type: single-node
-      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      ES_JAVA_OPTS: '-Xms512m -Xmx512m'
 
 volumes:
   mariadb:

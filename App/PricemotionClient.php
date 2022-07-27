@@ -40,19 +40,11 @@ class PricemotionClient {
             CURLOPT_RETURNTRANSFER => true,
         ];
         if (!curl_setopt_array($ch, $options)) {
-            throw new \RuntimeException(sprintf(
-                'curl_setopt_array failed: (%d) %s',
-                curl_errno($ch),
-                curl_error($ch)
-            ));
+            throw new \RuntimeException(sprintf('curl_setopt_array failed: (%d) %s', curl_errno($ch), curl_error($ch)));
         }
         $result = curl_exec($ch);
         if ($result === false) {
-            throw new \RuntimeException(sprintf(
-                'API request failed: (%d) %s',
-                curl_errno($ch),
-                curl_error($ch)
-            ));
+            throw new \RuntimeException(sprintf('API request failed: (%d) %s', curl_errno($ch), curl_error($ch)));
         }
         return $result;
     }

@@ -7,7 +7,7 @@ class ProductTest extends TestCase {
     public function testFromXmlResponse() {
         $product = self::getProduct();
 
-        $this->assertEquals(52.50, $product->getLowestPrice());
+        $this->assertEquals(52.5, $product->getLowestPrice());
         $this->assertEquals(60.67, $product->getAveragePrice());
 
         $this->assertCount(5, $product->getOffers());

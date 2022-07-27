@@ -5,8 +5,6 @@ if (!class_exists(Factory::class)) {
     require_once 'vendor/autoload.php';
 }
 
-return (new Factory(__DIR__))
-    ->exclude('adminer.dist.php')
-    ->config();
+return (new Factory(__DIR__))->exclude('adminer.dist.php')->config();
 
 // vim: set ft=php :

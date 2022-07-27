@@ -19,21 +19,19 @@ class Update extends Command {
 
     private $logger;
 
-    public function __construct(
-        string $name,
-        State $state,
-        Logger $logger
-    ) {
+    public function __construct(string $name, State $state, Logger $logger) {
         $this->state = $state;
         $this->logger = $logger;
         parent::__construct($name);
     }
 
     public function configure() {
-        $this->setDefinition(new InputDefinition([
-            new InputOption('force', 'f', InputOption::VALUE_NONE),
-            new InputOption('ean', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY),
-        ]));
+        $this->setDefinition(
+            new InputDefinition([
+                new InputOption('force', 'f', InputOption::VALUE_NONE),
+                new InputOption('ean', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY),
+            ]),
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {

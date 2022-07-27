@@ -337,13 +337,7 @@
       ],
       "description": "Common reflection classes used by phpdocumentor to reflect the code structure",
       "homepage": "http://www.phpdoc.org",
-      "keywords": [
-        "FQSEN",
-        "phpDocumentor",
-        "phpdoc",
-        "reflection",
-        "static analysis"
-      ],
+      "keywords": ["FQSEN", "phpDocumentor", "phpdoc", "reflection", "static analysis"],
       "support": {
         "issues": "https://github.com/phpDocumentor/ReflectionCommon/issues",
         "source": "https://github.com/phpDocumentor/ReflectionCommon/tree/2.x"

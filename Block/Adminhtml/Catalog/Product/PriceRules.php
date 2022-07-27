@@ -22,7 +22,9 @@ class PriceRules extends Widget {
     protected function getSettings(): array {
         return [
             'form' => [
-                'action' => $this->getUrl('pricemotion/*/*', ['_current' => true]),
+                'action' => $this->getUrl('pricemotion/*/*', [
+                    '_current' => true,
+                ]),
             ],
         ] + parent::getSettings();
     }
@@ -39,27 +41,21 @@ class PriceRules extends Widget {
         $toolbar = $this->getToolbar();
 
         if ($toolbar instanceof AbstractBlock) {
-            $toolbar->addChild(
-                'back_button',
-                \Magento\Backend\Block\Widget\Button::class,
-                [
-                    'label' => __('Back'),
-                    'onclick' => 'setLocation(\'' . $this->getUrl(
-                        'catalog/product/',
-                        ['store' => $this->getRequest()->getParam('store', 0)]
-                    ) . '\')',
-                    'class' => 'back',
-                ]
-            );
+            $toolbar->addChild('back_button', \Magento\Backend\Block\Widget\Button::class, [
+                'label' => __('Back'),
+                'onclick' =>
+                    'setLocation(\'' .
+                    $this->getUrl('catalog/product/', [
+                        'store' => $this->getRequest()->getParam('store', 0),
+                    ]) .
+                    '\')',
+                'class' => 'back',
+            ]);
 
-            $toolbar->addChild(
-                'save_button',
-                \Magento\Backend\Block\Widget\Button::class,
-                [
-                    'label' => __('Save'),
-                    'class' => 'save primary pricemotion-submit',
-                ]
-            );
+            $toolbar->addChild('save_button', \Magento\Backend\Block\Widget\Button::class, [
+                'label' => __('Save'),
+                'class' => 'save primary pricemotion-submit',
+            ]);
         }
 
         return parent::_prepareLayout();

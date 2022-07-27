@@ -68,12 +68,7 @@ class Update {
             return;
         } catch (Throwable $e) {
             $this->logger->critical(
-                sprintf(
-                    'Uncaught exception %s: (%d) %s',
-                    get_class($e),
-                    $e->getCode(),
-                    $e->getMessage()
-                )
+                sprintf('Uncaught exception %s: (%d) %s', get_class($e), $e->getCode(), $e->getMessage()),
             );
             $this->logger->critical((string) $e);
             throw $e;
@@ -116,19 +111,19 @@ class Update {
 
         $processed = 0;
         foreach ($products as $product) {
-            $this->logger->debug(sprintf(
-                'Product %d: %s',
-                $product->getId(),
-                json_encode($product->getData(), JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR)
-            ));
+            $this->logger->debug(
+                sprintf(
+                    'Product %d: %s',
+                    $product->getId(),
+                    json_encode($product->getData(), JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR),
+                ),
+            );
 
             $this->updater->update($product);
 
             $processed++;
 
-            if ($run_until !== null
-                && time() > $run_until
-            ) {
+            if ($run_until !== null && time() > $run_until) {
                 $this->logger->info(sprintf('Ran out of time after processing %d products', $processed));
                 return;
             }

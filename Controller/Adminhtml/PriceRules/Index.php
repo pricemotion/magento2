@@ -53,17 +53,17 @@ class Index extends Action implements HttpPostActionInterface, HttpGetActionInte
         }
 
         if (!$this->helper->getProductIds()) {
-            $this->messageManager->addErrorMessage(__('Please select products of which to change the Pricemotion price rules.'));
+            $this->messageManager->addErrorMessage(
+                __('Please select products of which to change the Pricemotion price rules.'),
+            );
             return $this->resultRedirectFactory->create()->setPath('catalog/product/', ['_current' => true]);
         }
 
         if ($this->_request->getParam('product_pricemotion_settings')) {
             $product_ids = $this->helper->getProductIds();
-            $this->logger->info(sprintf(
-                'Updating %s attribute on %d products',
-                Constants::ATTR_SETTINGS,
-                sizeof($product_ids)
-            ));
+            $this->logger->info(
+                sprintf('Updating %s attribute on %d products', Constants::ATTR_SETTINGS, sizeof($product_ids)),
+            );
             $start_time = microtime(true);
             $this->productAction->updateAttributes(
                 $product_ids,
@@ -71,17 +71,22 @@ class Index extends Action implements HttpPostActionInterface, HttpGetActionInte
                     Constants::ATTR_SETTINGS => $this->_request->getParam('product_pricemotion_settings'),
                     Constants::ATTR_UPDATED_AT => null,
                 ],
-                $this->_request->getParam('store', Store::DEFAULT_STORE_ID)
+                $this->_request->getParam('store', Store::DEFAULT_STORE_ID),
             );
             $duration = microtime(true) - $start_time;
             $this->logger->debug(sprintf('Mass update completed in %.4f s', $duration));
             $this->helper->setProductIds([]);
-            $this->messageManager->addSuccessMessage(__('Pricemotion price rules have been updated for %1 products.', sizeof($product_ids)));
+            $this->messageManager->addSuccessMessage(
+                __('Pricemotion price rules have been updated for %1 products.', sizeof($product_ids)),
+            );
             return $this->resultRedirectFactory->create()->setPath('catalog/product/', ['_current' => true]);
         }
 
         $page = $this->resultPageFactory->create();
-        $page->getConfig()->getTitle()->prepend(__('Update Pricemotion price rules'));
+        $page
+            ->getConfig()
+            ->getTitle()
+            ->prepend(__('Update Pricemotion price rules'));
 
         return $page;
     }

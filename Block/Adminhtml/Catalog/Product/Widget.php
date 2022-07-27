@@ -68,8 +68,12 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
             'widget_url' =>
                 Constants::getWebUrl() .
                 $this->getWidgetPath() .
-                '?' . http_build_query(['assetVersion' => Constants::getWidgetVersion()]) .
-                '#' . json_encode($parameters),
+                '?' .
+                http_build_query([
+                    'assetVersion' => Constants::getWidgetVersion(),
+                ]) .
+                '#' .
+                json_encode($parameters),
             'form_key' => $this->getFormKey(),
         ];
     }
@@ -91,7 +95,7 @@ abstract class Widget extends \Magento\Backend\Block\Widget {
             '%s://%s%s',
             parse_url($url, PHP_URL_SCHEME),
             parse_url($url, PHP_URL_HOST),
-            $port ? ":$port" : ''
+            $port ? ":$port" : '',
         );
     }
 }

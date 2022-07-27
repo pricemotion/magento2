@@ -10,8 +10,11 @@ class AddLowestPriceRatioFilterToCollection implements AddFilterToCollectionInte
         if (!is_array($condition)) {
             return;
         }
-        $collection->addFieldToFilter($field, array_map(function ($value) {
-            return 1 + (float) $value / 100;
-        }, $condition));
+        $collection->addFieldToFilter(
+            $field,
+            array_map(function ($value) {
+                return 1 + (float) $value / 100;
+            }, $condition),
+        );
     }
 }
