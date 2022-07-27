@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add setting to disable updates for products that do not have price rules set.
+
 ## 1.3.5.1 - 2022-06-13
 
 - Fix IteratorAggregate extension on PHP 8.1.
