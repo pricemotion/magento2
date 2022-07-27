@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <section id="Pricemotion_Magento2" showInDefault="1" sortOrder="200">
+        <section id="pricemotion" showInDefault="1" sortOrder="200">
             <label>Pricemotion</label>
             <tab>catalog</tab>
             <resource>Pricemotion_Magento2::config</resource>
@@ -13,6 +13,13 @@
                     <comment><![CDATA[Find your Pricemotion API key by logging in to <a href="https://www.pricemotion.nl" target="_blank" rel="noopener">Pricemotion</a>.]]></comment>
                     <validate>required-entry validate-data</validate>
                     <config_path>pricemotion/general/api_key</config_path>
+                </field>
+                <field id="products" showInDefault="1" type="select">
+                    <label>Products</label>
+                    <comment><![CDATA[In order to keep the price statistics (<i>Lowest Price</i>) updated, Pricemotion normally retrieves data for all products with EANs. If you want to use Pricemotion only for specific products, set this to "Follow only products with price rules".]]></comment>
+                    <validate>required-entry validate-select</validate>
+                    <source_model>Pricemotion\Magento2\Model\Config\Source\Products</source_model>
+                    <config_path>pricemotion/general/products</config_path>
                 </field>
             </group>
             <group id="attributes" showInDefault="1">
