@@ -1,4 +1,8 @@
 repos:
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: 50c5478ed9e10bf360335449280cf2a67f4edb7a
+    hooks:
+      - id: prettier
   - repo: https://github.com/apeschar/pre-commit-phan
     rev: ebd3bfb237c2aceb49fec2198ac69a64209a74a9
     hooks:

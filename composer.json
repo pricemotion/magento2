@@ -1,24 +1,24 @@
 {
-    "name": "pricemotion/module-pricemotion",
-    "description": "Stay aware of your competitor's prices with Pricemotion",
-    "type": "magento2-module",
-    "licence": "GPL-3.0-or-later",
-    "require": {
-        "php": ">=7.4",
-        "ext-json": "*",
-        "ext-curl": "*",
-        "ext-dom": "*"
-    },
-    "autoload": {
-        "files": [
-            "registration.php"
-        ],
-        "psr-4": {
-            "Pricemotion\\Magento2\\": ""
-        }
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^9",
-        "apeschar/php-cs-fixer": "^2"
+  "name": "pricemotion/module-pricemotion",
+  "description": "Stay aware of your competitor's prices with Pricemotion",
+  "type": "magento2-module",
+  "licence": "GPL-3.0-or-later",
+  "require": {
+    "php": ">=7.4",
+    "ext-json": "*",
+    "ext-curl": "*",
+    "ext-dom": "*"
+  },
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Pricemotion\\Magento2\\": ""
     }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9",
+    "apeschar/php-cs-fixer": "^2"
+  }
 }
