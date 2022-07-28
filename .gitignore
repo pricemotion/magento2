@@ -1,6 +1,7 @@
-/*.TAG
+/artifacts
 /dist
 /.php_cs.cache
 /pkg
+/*.TAG
 /vendor
 /www

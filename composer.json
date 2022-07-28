@@ -7,7 +7,8 @@
     "php": ">=7.4",
     "ext-json": "*",
     "ext-curl": "*",
-    "ext-dom": "*"
+    "ext-dom": "*",
+    "pricemotion/sdk": "1.2.0"
   },
   "autoload": {
     "files": [
