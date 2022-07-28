@@ -16,8 +16,6 @@ elif [[ $# -gt 1 ]]; then
 	exit 1
 fi
 
-./bin/package
-
 retrieve() {
 	local dest="$1"
 	local url="$2"
@@ -109,18 +107,6 @@ find vendor -maxdepth 3 -mindepth 3 -name composer.json |
 	jq -r '.suggest | select(.) | keys[]' |
 	grep -P '(^|-)sample-data($|-)' |
 	xargs "$composer" require --ignore-platform-reqs
-
-jq '
-	.repositories = [
-		{
-			type: "artifact",
-			url: "../dist"
-		}
-	] + .repositories
-' composer.json > composer.json.$$
-mv composer.json.$$ composer.json
-
-"$composer" require --ignore-platform-reqs pricemotion/module-pricemotion
 
 cd "$root"
 

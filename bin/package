@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-ref=
+ref=HEAD
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
@@ -12,6 +12,10 @@ while [[ $# -gt 0 ]]; do
 		ref="$1"
 		shift
 		;;
+	--dirty)
+		shift
+		ref="$(git stash create)"
+		;;
 	*)
 		echo "Usage: $0 [--version VERSION]" >&2
 		exit 1
@@ -19,18 +23,17 @@ while [[ $# -gt 0 ]]; do
 	esac
 done
 
-if [[ $ref = "" ]]; then
-	ref="$(git describe --tags --match 'v*')"
-fi
+ref="$(git rev-parse "$ref")"
+desc="$(git describe --tags --match 'v*' "$ref")"
 
-version="${ref#v}"
+version="${desc#v}"
 if [[ $version =~ ^([^-]+)-([0-9]+)-.+$ ]]; then
-	version="${BASH_REMATCH[1]}.$(date +%s)"
+	version="$(date +%s)"
 fi
 
 short_version="$(cut -f1-3 -d. <<<"$version")"
 
-out="$PWD/dist/pricemotion-magento2-$ref.zip"
+out="$PWD/dist/pricemotion-magento2-$desc.zip"
 
 echo "Packaging $ref as v$version (with Composer version v$short_version)..." >&2
 

@@ -3,14 +3,26 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-touch DEVELOPMENT.TAG
+package="$(bin/package --dirty)"
 
-mkdir -p www/app/code/Pricemotion
-rm -rf www/app/code/Pricemotion/Magento2
-ln -sfn ../../../.. www/app/code/Pricemotion/Magento2
+rm -rf artifacts
+mkdir artifacts
+ln "$package" "artifacts/${package##*/}"
 
-bin/clear-magento-cache
+jq '
+	.repositories =
+		[
+			{
+				type: "artifact",
+				url: "../artifacts"
+			}
+		]
+		+ (.repositories | map(select(.type != "artifact")))
+' www/composer.json > www/composer.json.$$
+mv www/composer.json.$$ www/composer.json
 
-docker-compose restart web
+"vendor/bin/composer" -d www require --ignore-platform-reqs pricemotion/module-pricemotion@dev
 
-bin/magento setup:upgrade
+# Run module setup
+# Clear caches
+# See: %.bak

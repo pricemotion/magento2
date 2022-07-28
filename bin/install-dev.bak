@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+touch DEVELOPMENT.TAG
+
+mkdir -p www/app/code/Pricemotion
+rm -rf www/app/code/Pricemotion/Magento2
+ln -sfn ../../../.. www/app/code/Pricemotion/Magento2
+
+bin/clear-magento-cache
+
+docker-compose restart web
+
+bin/magento setup:upgrade
