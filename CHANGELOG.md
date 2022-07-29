@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.7 - 2022-07-29
+
+- Use Pricemotion SDK.
+
 ## 1.3.6.1 - 2022-07-27
 
 - Magento Marketplace: Don't silence errors.
