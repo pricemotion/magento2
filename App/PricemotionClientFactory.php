@@ -11,12 +11,12 @@ class PricemotionClientFactory {
     }
 
     public function make(): Sdk\Api\Client {
-        $token = $this->config->getApiToken();
+        $key = $this->config->getApiKey();
 
-        if ($token === null) {
+        if ($key === null) {
             throw new \RuntimeException('Pricemotion API key is not configured');
         }
 
-        return new Sdk\Api\Client($token);
+        return new Sdk\Api\Client($key);
     }
 }
