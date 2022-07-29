@@ -15,6 +15,9 @@ while [[ $# -gt 0 ]]; do
 	--dirty)
 		shift
 		ref="$(git stash create)"
+		if [[ ! $ref ]]; then
+			ref=HEAD
+		fi
 		;;
 	*)
 		echo "Usage: $0 [--version VERSION]" >&2
