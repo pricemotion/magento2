@@ -13,6 +13,7 @@ $vendorDirectories = [
     'www/vendor/magento/module-store',
     'www/vendor/magento/module-ui',
     'www/vendor/monolog/monolog',
+    'www/vendor/pricemotion/sdk',
     'www/vendor/symfony/console',
 ];
 

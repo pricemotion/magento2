@@ -13,7 +13,7 @@ use Magento\Framework\Indexer\AbstractProcessor;
 use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\Framework\Mview\View\Changelog;
 use Magento\Indexer\Model\Indexer\Collection;
-use Pricemotion\Magento2\App\Product as PricemotionProduct;
+use Pricemotion\Sdk;
 use Pricemotion\Magento2\Logger\Logger;
 use Pricemotion\Magento2\Model\Attributes;
 use Pricemotion\Magento2\Observer\ProductSave;
@@ -47,7 +47,7 @@ class ProductUpdater {
     public function __construct(
         Logger $logger,
         Config $config,
-        PricemotionClient $pricemotion,
+        PricemotionClientFactory $pricemotionClientFactory,
         Action $productAction,
         ProductSave $productSaveObserver,
         IndexerRegistry $indexerRegistry,
@@ -57,7 +57,7 @@ class ProductUpdater {
     ) {
         $this->logger = $logger;
         $this->config = $config;
-        $this->pricemotion = $pricemotion;
+        $this->pricemotion = $pricemotionClientFactory->make();
         $this->productAction = $productAction;
         $this->productSaveObserver = $productSaveObserver;
         $this->indexerRegistry = $indexerRegistry;
@@ -156,7 +156,7 @@ class ProductUpdater {
         $ean_string = $product->getData($this->config->requireEanAttribute());
 
         try {
-            $ean = Ean::fromString($ean_string);
+            $ean = Sdk\Data\Ean::fromString($ean_string);
         } catch (InvalidArgumentException $e) {
             $this->logger->debug(
                 sprintf(
@@ -244,7 +244,7 @@ class ProductUpdater {
         return false;
     }
 
-    private function getNewPrice(Product $product, PricemotionProduct $pricemotion_product): ?float {
+    private function getNewPrice(Product $product, Sdk\Data\Product $pricemotion_product): ?float {
         $settings = $this->getSettings($product);
         if (!$settings) {
             return null;
@@ -391,20 +391,20 @@ class ProductUpdater {
         return $settings;
     }
 
-    private function getPriceRule(Product $product): ?PriceRule\PriceRuleInterface {
+    private function getPriceRule(Product $product): ?Sdk\PriceRule\PriceRuleInterface {
         $settings = $this->getSettings($product);
         if (!$settings) {
             return null;
         }
 
         try {
-            $rule = (new PriceRule\Factory())->fromArray($settings);
+            $rule = (new Sdk\PriceRule\Factory())->fromArray($settings);
         } catch (InvalidArgumentException $e) {
             $this->logger->error(sprintf('Invalid price rule for product %d: %s', $product->getId(), $e->getMessage()));
             return null;
         }
 
-        if ($rule instanceof PriceRule\Disabled) {
+        if ($rule instanceof Sdk\PriceRule\Disabled) {
             return null;
         }
 
