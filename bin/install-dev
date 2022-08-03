@@ -40,7 +40,7 @@ jq '
 ' www/composer.json > www/composer.json.$$
 mv www/composer.json.$$ www/composer.json
 
-"vendor/bin/composer" -d www require --ignore-platform-reqs pricemotion/module-pricemotion
+"vendor/bin/composer" -d www require --ignore-platform-reqs --with-all-dependencies pricemotion/module-pricemotion
 
 bin/clear-magento-cache
 
