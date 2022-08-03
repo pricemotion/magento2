@@ -3,6 +3,11 @@
   "description": "Stay aware of your competitor's prices with Pricemotion",
   "type": "magento2-module",
   "licence": "GPL-3.0-or-later",
+  "config": {
+    "platform": {
+      "php": "7.4.30"
+    }
+  },
   "require": {
     "php": ">=7.4",
     "ext-json": "*",
