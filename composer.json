@@ -22,7 +22,8 @@
     "ext-curl": "*",
     "ext-dom": "*",
     "pricemotion/sdk": "1.2.1",
-    "symfony/contracts": ">=1.1.0"
+    "symfony/contracts": ">=1.1.0",
+    "psr/cache": ">=1"
   },
   "require-dev": {
     "phpunit/phpunit": "^9",
